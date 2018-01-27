@@ -1,10 +1,9 @@
 local parser = require "parser"
-local shine = require "shine"
-local camera = require "camera"
 require "gooi"
 local gooi = gooi
 local moan = require "Moan"
 local drawMainScreen = require "mainScreen"
+local audioHandler = require "audioHandler"
 
 io.stdout:setvbuf "no"
 
