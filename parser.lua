@@ -44,7 +44,9 @@ end
 --- Contains all commands recognized by the parser.
 --- @see processLine
 local commands = {
-
+    continue = function(val, tbl)
+        parser.processLine(val:sub(7), false, true)
+    end --- Processes the line, but does not yield.
 }
 
 --- Contains any prefixes recognized by the parser.
@@ -153,7 +155,7 @@ end
 --- Processes the file at the given path using require(). Returns a coroutine to the parser and the table it's reading from, or false if it is unsuccessful.
 --- @tparam string path The path to the file to parse.
 --- @treturn coroutine,table|false A coroutine to the parser and the table it's reading from, or false if it is unsuccessful.
-function parser.process(path)
+function parser.parse(path)
     local processTbl = require(path)
     if type(processTbl) == "table" then
         return coroutine.create(parser.processVal), processTbl
