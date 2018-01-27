@@ -82,6 +82,8 @@ if Moan.font == nil then
     Moan.font = defaultFont
 end
 
+local typing = false
+
 -------------------------------------------------
 -- Message instance constructor
 --
@@ -177,7 +179,7 @@ end
 -------------------------------------------------
 function Moan.update(dt)
     -- Check if the output string is equal to final string, else we must be still typing it
-    local typing = printedText == Moan.currentMessage
+    typing = printedText ~= Moan.currentMessage
 
     if Moan.showingMessage then
         -- Tiny timer for the message indicator
@@ -244,7 +246,11 @@ end
 -- if love.keyboard.isDown("space") then Moan.advanceMsg() end
 -------------------------------------------------
 function Moan.advanceMsg()
-    local typing
+    if typing then
+        printedText = Moan.currentMessage
+        typePosition = #printedText
+        return
+    end
     if Moan.showingMessage then
         -- Check if we're at the last message in the instances queue (+1 because "\n" indicated end of instance)
         if Moan.allMsgs[Moan.currentMsgInstance].messages[Moan.currentMsgKey + 1] == "\n" then
