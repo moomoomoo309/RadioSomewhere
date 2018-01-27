@@ -36,7 +36,7 @@ local face = sprite {
 
 local textboxCanvas = love.graphics.newCanvas(w, h)
 
-local crtFont = love.graphics.newFont("assets/VT323-Regular.ttf", 72)
+local crtFont = love.graphics.newFont("assets/VT323-Regular.ttf", 72*love.window.h / 720)
 
 local glowEffect = shine.glowsimple()
 glowEffect.min_luma = .3
@@ -84,9 +84,9 @@ local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite)
             love.graphics.setFont(msgFont)
         end
         if moan.autoWrap then
-            love.graphics.print(text, msgBox.x, msgBox.y)
+            love.graphics.print("##"..text, msgBox.x, msgBox.y)
         else
-            love.graphics.printf(text, msgBox.x, msgBox.y, msgBox.w)
+            love.graphics.printf("##"..text, msgBox.x, msgBox.y, msgBox.w)
         end
 
         if moan.showingOptions then
@@ -123,7 +123,7 @@ local function draw()
         love.graphics.pop()
     end)
     love.graphics.setCanvas()
-    love.graphics.draw(textboxCanvas, w * 235 / 960, h * 377 / 540, 0, .54, .17)
+    love.graphics.draw(textboxCanvas, w * 235 / 960, h * 377 / 540, 0, .54, .16)
     love.graphics.setCanvas(textboxCanvas)
     love.graphics.clear()
     love.graphics.setCanvas()

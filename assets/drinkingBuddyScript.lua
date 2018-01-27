@@ -9,7 +9,7 @@ return {
             "#thomas: You, me, and the rest of the world space man. I haven't been able to get a signal worth a damn since all this started",
             "#uwsss: What happened down there?",
             "#thomas: …",
-            "uwsss: What happened down there?",
+            "#uwsss: What happened down there?",
             "#thomas: I’m sorry… You must be the last person alive that doesn't know.",
             "#thomas: The world is coming to an end. I’m sorry.",
             "#uwsss: …",
@@ -51,7 +51,7 @@ return {
             "#uwsss: Yeah. Send it over",
             "#thomas: Thanks for everything space man.",
             "#uwsss: You’re welcome Thomas.",
-            "T R A N S M I S S I O N        O V E R",
+            "  T R A N S M I S S I O N        O V E R",
         },
     },
 }
