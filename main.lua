@@ -15,19 +15,15 @@ local function randomstring(len)
     return table.concat(str)
 end
 
+local currentParser, script
+
 function love.load()
-    moan.speak("?", { randomstring(60) })
-    moan.speak("?", { randomstring(60) })
-    moan.speak("?", { randomstring(60) })
-    moan.speak("?", { randomstring(60) })
-    moan.speak("?", { randomstring(60) })
+    moan.speak("?", {""})
+    currentParser, script = parser.parse "assets.drinkingBuddyScript"
+    parser.unlock()
 end
 
 function love.draw()
-    local oldColor = { love.graphics.getColor() }
-    love.graphics.setColor(128, 128, 128)
-    love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
-    love.graphics.setColor(oldColor)
     drawMainScreen()
     gooi.draw()
 end
@@ -37,12 +33,31 @@ function love.update(dt)
     gooi.update(dt)
 end
 
+function advanceDialogue()
+    if not parser.locked() then
+        if coroutine.status(currentParser) ~= "dead" then
+            local success, msg = coroutine.resume(currentParser, script, currentParser)
+            print(success, msg)
+            if not success then
+                print(msg)
+            elseif msg then
+                if not moan.typing then
+                    moan.speak("", {msg})
+                end
+                moan.advanceMsg()
+            end
+        else
+            print "ded"
+        end
+    end
+end
+
 function love.keypressed(key, scancode, isrepeat)
     if key == "escape" then
         love.event.quit()
     end
     if key == "space" then
-        moan.advanceMsg()
+        advanceDialogue()
     end
 end
 

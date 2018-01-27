@@ -24,11 +24,14 @@ local function promptPlayer(tbl, process)
         buttons = nil
     end
 
-    local choice
+    local choice, option
     for k in pairs(choices) do
-        local btn = gooi.newButton(k):onRelease(function(self)
+        local btn = gooi.newButton(k:sub(9)):onRelease(function(self)
+            self.text = "#uwsss: "..self.text
+            option = self.text
             choice = choices[self.text]
             clearButtons()
+            advanceDialogue()
             coroutine.resume(process)
         end)
         btn.x = love.graphics.getWidth() / 2 - btn.w / 2
@@ -38,7 +41,7 @@ local function promptPlayer(tbl, process)
     repeat
         coroutine.yield() -- Until a choice is picked, don't go back to processVal.
     until choice
-    return choice
+    return choice, option
 end
 
 --- Contains all commands recognized by the parser.
@@ -56,7 +59,7 @@ local prefixes = {
         assert(type(val) == "string", ("String expected, got %s."):format(type(val)))
         scene:printText(val:sub(3), false, { 255, 0, 0 })
         if not noYield then
-            coroutine.yield()
+            coroutine.yield(val)
         end
     end,
     ["/t{"] = function(val, _, noYield)
@@ -67,7 +70,7 @@ local prefixes = {
         assert(#color == 3 or #color == 4, ("Length of color table must be 3 or 4, was %d."):format(#color))
         scene:printText(val:sub(findClosingBrace + 1), false, color)
         if not noYield then
-            coroutine.yield()
+            coroutine.yield(val)
         end
     end,
     ["/t#"] = function(val, _, noYield)
@@ -77,7 +80,7 @@ local prefixes = {
         assert(color, ("Could not parse #%s as hex string"):format(val:sub(4, (alpha and 12 or 10))))
         scene:printText(val:sub(alpha and 12 or 10), false, { tonumber("0x" .. val:sub(4, 6)), tonumber("0x" .. val:sub(6, 8)), tonumber("0x" .. val:sub(8, 10)), alpha and tonumber("0x" .. val:sub(10, 12)) or nil })
         if not noYield then
-            coroutine.yield()
+            coroutine.yield(val)
         end
     end,
     ["@"] = function(val, tbl, noYield)
@@ -107,7 +110,7 @@ function parser.processLine(val, tbl, noYield)
     if not prefixed then
         --No prefix was recognized, so just put the text on the screen.
         if not noYield then
-            coroutine.yield()
+            coroutine.yield(val)
         end
     end
 end
@@ -126,7 +129,9 @@ function parser.processVal(tbl, process, noYield)
             if t == "string" then
                 parser.processLine(val, tbl, noYield)
             elseif t == "table" then
-                parser.processVal(promptPlayer(val, process), process, noYield)
+                local option, text = promptPlayer(val, process)
+                parser.processLine(text, process, noYield)
+                parser.processVal(option, process, noYield)
             elseif t == "function" then
                 parser.processVal(val(val, tbl), process, noYield)
             end
