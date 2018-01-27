@@ -6,8 +6,10 @@ local gooi = gooi
 local moan = require "Moan"
 local drawMainScreen = require "mainScreen"
 
+io.stdout:setvbuf "no"
+
 function love.load()
-    moan.speak("???????????", {"?????????"})
+    moan.speak("?",{"ABCDEFGHIJKL"})
 end
 
 function love.draw()
