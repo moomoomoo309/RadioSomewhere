@@ -34,9 +34,6 @@ local face = sprite {
     filterMax = "linear"
 }
 
-local personImage
-local textbox
-
 local textboxCanvas = love.graphics.newCanvas(w, h)
 
 local crtFont = love.graphics.newFont("assets/VT323-Regular.ttf", 72)
@@ -59,18 +56,23 @@ local msgFont = crtFont
 local nextMsgSprite
 
 local fullCrtEffect = boxblur:chain(glowEffect):chain(scanlineEffect):chain(static)
+
 local faceGlowEffect = shine.glowsimple()
 faceGlowEffect.min_luma = .9
+
 local faceScanlineEffect = shine.scanlines()
 faceScanlineEffect.opacity = .5
 faceScanlineEffect.line_height = .3
 faceScanlineEffect.pixel_size = 3
+
 local faceBlurEffect = shine.boxblur()
 faceBlurEffect.radius_h = 1.5
 faceBlurEffect.radius_v = 1.5
+
 local faceStatic = shine.filmgrain()
 faceStatic.opacity = .15
 faceStatic.grainsize = 1
+
 local faceCrtEffect = faceBlurEffect:chain(faceGlowEffect):chain(faceScanlineEffect):chain(faceStatic)
 
 
