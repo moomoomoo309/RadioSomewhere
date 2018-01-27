@@ -57,9 +57,6 @@ local nextMsgSprite
 
 local fullCrtEffect = boxblur:chain(glowEffect):chain(scanlineEffect):chain(static)
 
-local faceGlowEffect = shine.glowsimple()
-faceGlowEffect.min_luma = .9
-
 local faceScanlineEffect = shine.scanlines()
 faceScanlineEffect.opacity = .5
 faceScanlineEffect.line_height = .3
@@ -73,7 +70,7 @@ local faceStatic = shine.filmgrain()
 faceStatic.opacity = .15
 faceStatic.grainsize = 1
 
-local faceCrtEffect = faceBlurEffect:chain(faceGlowEffect):chain(faceScanlineEffect):chain(faceStatic)
+local faceCrtEffect = faceBlurEffect:chain(faceScanlineEffect):chain(faceStatic)
 
 
 local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite)
