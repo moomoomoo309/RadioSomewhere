@@ -15,11 +15,21 @@ local console = sprite {
 }
 
 local crt = sprite {
-    x=0,
-    y=0,
+    x = 0,
+    y = 0,
     w = love.graphics.getWidth(),
     h = love.graphics.getHeight(),
     imagePath = "assets/crt.png",
+    filterMin = "linear",
+    filterMax = "linear"
+}
+
+local face = sprite {
+    x = 0,
+    y = 0,
+    w = love.graphics.getWidth(),
+    h = love.graphics.getHeight(),
+    imagePath = "assets/face1.png",
     filterMin = "linear",
     filterMax = "linear"
 }
@@ -32,7 +42,7 @@ local textboxCanvas = love.graphics.newCanvas(w, h)
 local crtFont = love.graphics.newFont("assets/VT323-Regular.ttf", 72)
 
 local glowEffect = shine.glowsimple()
-glowEffect.min_luma = .7
+glowEffect.min_luma = .3
 local scanlineEffect = shine.scanlines()
 scanlineEffect.opacity = .5
 scanlineEffect.line_height = .4
@@ -49,6 +59,20 @@ local msgFont = crtFont
 local nextMsgSprite
 
 local fullCrtEffect = boxblur:chain(glowEffect):chain(scanlineEffect):chain(static)
+local faceGlowEffect = shine.glowsimple()
+faceGlowEffect.min_luma = .9
+local faceScanlineEffect = shine.scanlines()
+faceScanlineEffect.opacity = .5
+faceScanlineEffect.line_height = .3
+faceScanlineEffect.pixel_size = 3
+local faceBlurEffect = shine.boxblur()
+faceBlurEffect.radius_h = 1.5
+faceBlurEffect.radius_v = 1.5
+local faceStatic = shine.filmgrain()
+faceStatic.opacity = .15
+faceStatic.grainsize = 1
+local faceCrtEffect = faceBlurEffect:chain(faceGlowEffect):chain(faceScanlineEffect):chain(faceStatic)
+
 
 local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite)
     if moan.showingMessage then
@@ -92,26 +116,19 @@ end
 
 local function draw()
     console:draw()
-    --[[
-    love.graphics.setCanvas(crtWindowCanvas)
-    fullCrtEffect:draw(function()
-        personImage:draw()
-    end)
-    --]]
-    ---[[
     love.graphics.setCanvas(textboxCanvas)
     fullCrtEffect:draw(function()
         love.graphics.push()
-        love.graphics.scale(1,2)
+        love.graphics.scale(1, 2)
         moanDraw()
         love.graphics.pop()
     end)
-    --]]
     love.graphics.setCanvas()
     love.graphics.draw(textboxCanvas, w * 235 / 960, h * 377 / 540, 0, .54, .17)
     love.graphics.setCanvas(textboxCanvas)
     love.graphics.clear()
     love.graphics.setCanvas()
+    faceCrtEffect:draw(function() face:draw() end)
     crt:draw()
 end
 
