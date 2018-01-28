@@ -35,19 +35,21 @@ end
 
 function advanceDialogue()
     if not parser.locked() then
-        if coroutine.status(currentParser) ~= "dead" then
-            local success, msg = coroutine.resume(currentParser, script, currentParser)
-            print(success, msg)
-            if not success then
-                print(msg)
-            elseif msg then
-                if not moan.typing then
+        if not moan.typing then
+            if coroutine.status(currentParser) ~= "dead" then
+                local success, msg = coroutine.resume(currentParser, script, currentParser)
+                print(success, msg)
+                if not success then
+                    print(msg)
+                elseif msg then
                     moan.speak("", {msg})
+                    moan.advanceMsg()
                 end
-                moan.advanceMsg()
+            else
+                print "ded"
             end
         else
-            print "ded"
+            moan.advanceMsg()
         end
     end
 end
