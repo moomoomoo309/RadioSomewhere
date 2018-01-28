@@ -60,7 +60,7 @@ local function init()
     --[[
     --Main Menu Buttons
     --]]
-    local startBtn = gooi.newButton({
+    startBtn = gooi.newButton({
         text = "Start",
         x = menuButton_xLocation,
         y = menuButton_yLocation,

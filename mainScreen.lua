@@ -86,10 +86,11 @@ local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite)
             love.graphics.setFont(msgFont)
         end
         if #text > 0 then
+            local padStr = text:sub(1,1) == "#" and "##" or "  "
             if moan.autoWrap then
-                love.graphics.print("##"..text, msgBox.x, msgBox.y)
+                love.graphics.print(padStr..text, msgBox.x, msgBox.y)
             else
-                love.graphics.printf("##"..text, msgBox.x, msgBox.y, msgBox.w)
+                love.graphics.printf(padStr..text, msgBox.x, msgBox.y, msgBox.w)
             end
         end
 
