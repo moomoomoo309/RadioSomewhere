@@ -4,10 +4,13 @@ local gooi = gooi
 local moan = require "Moan"
 local drawMainScreen = require "mainScreen"
 local audioHandler = require "audioHandler"
+local gui = require "game-gui.gui"
 
 local gui = require "game-gui.gui"
 
 io.stdout:setvbuf "no"
+
+gui.init()
 
 local function randomstring(len)
     local str = {}
