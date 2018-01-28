@@ -9,7 +9,7 @@ local function addFromAudioObject(audioObj, name)
     audioHandler.audioObjs[name] = audioObj
 end
 
-local audioDir = "/assets"
+local audioDir = "assets/"
 
 audioHandler = {
     audioObjs = {},
@@ -184,6 +184,7 @@ end
 local files = { names = {}, priority = {}, extensions = {} }
 
 --Grab all the audio files
+print(audioDir)
 for _, v in pairs(love.filesystem.getDirectoryItems(audioDir)) do
     local filePathWithoutExtension = audioDir .. (v:sub(1, v:find(".", nil, true) and #v - v:reverse():find(".", nil, true) or #v))
     local name = filePathWithoutExtension:sub(#audioDir + 1)
@@ -200,6 +201,7 @@ end
 --Add them all
 for name in pairs(files.names) do
     audioHandler.add(("%s/%s.%s"):format(audioDir, name, files.extensions[name]), name)
+    print(("%s/%s.%s"):format(audioDir, name, files.extensions[name]), name)
 end
 files = nil
 
