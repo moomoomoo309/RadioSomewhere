@@ -5,6 +5,8 @@ local moan = require "Moan"
 local drawMainScreen = require "mainScreen"
 local audioHandler = require "audioHandler"
 
+local gui = require "game-gui.gui"
+
 io.stdout:setvbuf "no"
 
 local function randomstring(len)
@@ -16,6 +18,11 @@ local function randomstring(len)
 end
 
 local currentParser, script
+
+gui.init()
+function init()
+    gui.init()
+end
 
 function love.load()
     moan.speak("?", {""})
@@ -35,7 +42,7 @@ end
 
 function advanceDialogue()
     if not parser.locked() then
-        if not moan.typing then
+        if not moan.typing and not moan.showingOptions then
             if coroutine.status(currentParser) ~= "dead" then
                 local success, msg = coroutine.resume(currentParser, script, currentParser)
                 print(success, msg)
@@ -60,6 +67,9 @@ function love.keypressed(key, scancode, isrepeat)
     end
     if key == "space" then
         advanceDialogue()
+    end
+    if key == "p" then
+        gui.pause()
     end
 end
 
