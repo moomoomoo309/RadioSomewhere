@@ -1,8 +1,11 @@
 local sprite = require "sprite"
 local shine = require "shine"
 local moan = require "Moan"
+require "gooi"
 
 local w, h = love.graphics.getDimensions()
+
+local textColor = {74, 215, 255}
 
 local console = sprite {
     x = 0,
@@ -57,6 +60,9 @@ local nextMsgSprite
 
 local fullCrtEffect = boxblur:chain(glowEffect):chain(scanlineEffect):chain(static)
 
+local faceGlowEffect = shine.glowsimple()
+faceGlowEffect.min_luma = .9
+
 local faceScanlineEffect = shine.scanlines()
 faceScanlineEffect.opacity = .5
 faceScanlineEffect.line_height = .3
@@ -77,7 +83,7 @@ local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite)
     if moan.showingMessage then
         text = text or moan.getPrintedText()
         local oldColor = { love.graphics.getColor() }
-        love.graphics.setColor(74, 215, 255)
+        love.graphics.setColor(unpack(textColor))
         local oldFont
 
         if msgFont then
@@ -129,6 +135,10 @@ local function draw()
     love.graphics.setCanvas()
     faceCrtEffect:draw(function() face:draw() end)
     crt:draw()
+    faceCrtEffect:draw(function()
+        gooi.draw "main_menu"
+        gooi.draw()
+    end)
 end
 
 
