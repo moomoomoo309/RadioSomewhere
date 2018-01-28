@@ -82,8 +82,6 @@ if Moan.font == nil then
     Moan.font = defaultFont
 end
 
-local typing = false
-
 -------------------------------------------------
 -- Message instance constructor
 --
@@ -179,7 +177,7 @@ end
 -------------------------------------------------
 function Moan.update(dt)
     -- Check if the output string is equal to final string, else we must be still typing it
-    typing = printedText ~= Moan.currentMessage
+    Moan.typing = printedText ~= Moan.currentMessage
 
     if Moan.showingMessage then
         -- Tiny timer for the message indicator
@@ -225,7 +223,7 @@ function Moan.update(dt)
             -- Adjust position, use string.sub to get sub-string
             if typeTimer <= 0 then
                 -- Only make the keypress sound if the next character is a letter
-                if string.sub(Moan.currentMessage, typePosition, typePosition) ~= " " and typing then
+                if string.sub(Moan.currentMessage, typePosition, typePosition) ~= " " and Moan.typing then
                     Moan.playSound(Moan.typeSound)
                 end
                 typeTimer = typeTimerMax
@@ -246,7 +244,7 @@ end
 -- if love.keyboard.isDown("space") then Moan.advanceMsg() end
 -------------------------------------------------
 function Moan.advanceMsg()
-    if typing then
+    if Moan.typing then
         printedText = Moan.currentMessage
         typePosition = #printedText
         return
@@ -262,7 +260,7 @@ function Moan.advanceMsg()
                 Moan.currentMsgInstance = 1
                 Moan.currentMsgKey = 1
                 Moan.currentOption = 1
-                typing = false
+                Moan.typing = false
                 Moan.showingMessage = false
                 typePosition = 0
                 Moan.showingOptions = false
@@ -397,7 +395,7 @@ function Moan.draw()
         end
 
         -- Message options (when shown)
-        if Moan.showingOptions and typing == false then
+        if Moan.showingOptions and Moan.typing == false then
             for k, option in pairs(Moan.allMsgs[Moan.currentMsgInstance].options) do
                 -- First option has no Y padding...
                 love.graphics.print(option[1], textX + padding, optionsY + ((k - 1) * optionsSpace))
@@ -446,7 +444,7 @@ end
 -------------------------------------------------
 function Moan.keyreleased(key)
     if Moan.showingOptions then
-        if key == Moan.selectButton and not typing then
+        if key == Moan.selectButton and not Moan.typing then
             if Moan.currentMsgKey == #Moan.allMsgs[Moan.currentMsgInstance].messages - 1 then
                 -- Execute the selected option function
                 for i = 1, #Moan.allMsgs[Moan.currentMsgInstance].options do
@@ -484,7 +482,7 @@ function Moan.keyreleased(key)
             typePosition = typePosition - 1
             typeTimer = 0
         else
-            if typing == true then
+            if Moan.typing == true then
                 -- Skip the typing completely, replace all -- with spaces since we're skipping the pauses
                 Moan.currentMessage = string.gsub(Moan.currentMessage, "%-%-", " ")
                 printedText = Moan.currentMessage
