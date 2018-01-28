@@ -31,7 +31,6 @@ local function promptPlayer(tbl, process)
             option = self.text
             choice = choices[self.text]
             clearButtons()
-            advanceDialogue()
             coroutine.resume(process)
         end)
         btn.x = love.graphics.getWidth() / 2 - btn.w / 2
