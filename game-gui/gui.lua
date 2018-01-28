@@ -1,11 +1,17 @@
+---
+--- Created by Justin Neria.
+--- DateTime: 1/26/2018 9:22 PM
+---
+
 require "gooi"
+local moan = require "Moan"
 
 local height = love.graphics.getHeight()
 local width = love.graphics.getWidth()
 
 local menuButton_xLocation = width * 360 / 960
 local menuButton_yLocation = height * 360 / 540
-local menuButton_xIncrement = height / 12
+local menuButton_xIncrement = height / 16
 local menuButtonHeight = height / 16
 local menuButtonWidth = width / 10
 
@@ -54,14 +60,14 @@ local function init()
     --[[
     --Main Menu Buttons
     --]]
-    startBtn = gooi.newButton({
+    local startBtn = gooi.newButton({
         text = "Start",
         x = menuButton_xLocation,
         y = menuButton_yLocation,
         w = menuButtonWidth,
         h = menuButtonHeight,
         group = "main_menu",
-    })                   :onRelease(function()
+    }):onRelease(function()
         gooi.setGroupVisible("main_menu", false)
         --Make sure that the settings are not visible on game start
         if settingsPanelComponents[1].visible == true then
@@ -79,7 +85,7 @@ local function init()
         w = menuButtonWidth,
         h = menuButtonHeight,
         group = "main_menu"
-    })                      :onRelease(function(self)
+    }):onRelease(function(self)
         if self.visible then
             toggleVisible()
 
@@ -93,8 +99,8 @@ local function init()
         w = menuButtonWidth,
         h = menuButtonHeight,
         group = "main_menu",
-    --icon = "imgs/exit.png"
-    })                  :onRelease(function(self)
+        --icon = "imgs/exit.png"
+    }):onRelease(function(self)
         if self.visible then
             gooi.confirm({
                 text = "Are you sure?",
@@ -110,27 +116,62 @@ local function init()
     --Settings Panel Generator
     --]]
     local settingsPanel = gooi.newPanel({
-        x = 120,
-        y = 320,
+        x = width * 200 / 960,
+        y = height * 200 / 540,
         w = 200,
         h = 180,
-        layout = "grid 4x2"
+        layout = "grid 6x2"
     })
 
+    local file
+    file = love.filesystem.newFile("currentResolution.txt")
     settingsPanelComponents = {
         gooi.newLabel({ text = "Text \nSpeed" }),
         gooi.newSlider({ value = .5 }),
-        gooi.newLabel({ text = "1" }):center(),
+        gooi.newLabel({ text = "txtSpdDisplay" }):center(),
         gooi.newLabel({ text = "Sound" }),
         gooi.newSlider({ value = .5 }),
-        gooi.newLabel({ text = "placeholder" }):center()
-    }
+        gooi.newLabel({ text = "volumeDisplay" }):center(),
+        gooi.newLabel({ text = "Resolution" }),
+        gooi.newButton({ text = width .. "x" .. height }):onRelease(function(self)
+            if self.text == "3840x2160" then
+                self:setText("1280x720")
+                love.filesystem.write("currentResolution.txt", "1280\n720")
+            end
+            if self.text == "3200x1800" then
+                self:setText("3840x2160")
+                love.filesystem.write("currentResolution.txt", "3840\n2160")
+            end
+            if self.text == "2560x1440" then
+                self:setText("3200x1800")
+                love.filesystem.write("currentResolution.txt", "3200\n1800")
+            end
+            if self.text == "1920x1080" then
+                self:setText("2560x1440")
+                love.filesystem.write("currentResolution.txt", "2560\n1440")
+            end
+            if self.text == "1366x768" then
+                self:setText("1920x1080")
+                love.filesystem.write("currentResolution.txt", "1920\n1080")
+            end
+            if self.text == "1360x768" then
+                self:setText("1366x768")
+                love.filesystem.write("currentResolution.txt", "1366\n768")
+            end
+            if self.text == "1280x720" then
+                self:setText("1360x768")
+                love.filesystem.write("currentResolution.txt", "1360\n768")
+            end
+        end),
+        gooi.newLabel({ text = "Change will take \nplace after restart" }) }
     --Update
     settingsPanelComponents[2].callback = function(self, newValue)
         settingsPanelComponents[3]:setText(("%d%%"):format(newValue * 100))
+        moan.setSpeed(.08 - newValue * .07)
     end
     settingsPanelComponents[5].callback = function(self, newValue)
         settingsPanelComponents[6]:setText(("%.1f%%"):format(newValue * 100))
+        love.audio.setVolume(newValue)
     end
 
     settingsPanel:setRowspan(1, 1, 2)
@@ -138,7 +179,7 @@ local function init()
     settingsPanel:add(unpack(settingsPanelComponents))
 
     --Make sure settings visibility is off by default
-    for i = 1, 6 do
+    for i = 1, 9 do
         settingsPanelComponents[i].visible = false
     end
 
