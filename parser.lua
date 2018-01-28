@@ -1,6 +1,8 @@
 --- A module allowing scripts of dialogue to be parsed.
 --- @module parser
 
+local moan = require "Moan"
+
 local locked = true
 local parser = {}
 
@@ -26,8 +28,8 @@ local function promptPlayer(tbl, process)
 
     local choice, option
     for k in pairs(choices) do
-        local btn = gooi.newButton(k:sub(9)):onRelease(function(self)
-            self.text = "#uwsss: "..self.text
+        local btn = gooi.newButton { text = k:sub(9) }:onRelease(function(self)
+            self.text = "#uwsss: " .. self.text
             option = self.text
             choice = choices[self.text]
             clearButtons()
@@ -42,6 +44,21 @@ local function promptPlayer(tbl, process)
         coroutine.yield() -- Until a choice is picked, don't go back to processVal.
     until choice
     return choice, option
+end
+
+local function newPromptPlayer(tbl, process)
+    local choices = {}
+    local option
+    for k, v in pairs(tbl) do
+        if v then
+            choices[k] = function() option = k end
+        end
+    end
+    moan.speak("", nil, {options=choices})
+    repeat
+        coroutine.yield() -- Until a choice is picked, don't go back to processVal.
+    until option
+    return tbl[option], option
 end
 
 --- Contains all commands recognized by the parser.
@@ -129,7 +146,7 @@ function parser.processVal(tbl, process, noYield)
             if t == "string" then
                 parser.processLine(val, tbl, noYield)
             elseif t == "table" then
-                local option, text = promptPlayer(val, process)
+                local option, text = newPromptPlayer(val, process)
                 parser.processLine(text, process, noYield)
                 parser.processVal(option, process, noYield)
             elseif t == "function" then

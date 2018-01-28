@@ -5,7 +5,7 @@ require "gooi"
 
 local w, h = love.graphics.getDimensions()
 
-local textColor = {74, 215, 255}
+local textColor = { 74, 215, 255 }
 
 local console = sprite {
     x = 0,
@@ -39,7 +39,7 @@ local face = sprite {
 
 local textboxCanvas = love.graphics.newCanvas(w, h)
 
-local crtFont = love.graphics.newFont("assets/VT323-Regular.ttf", 72*love.window.h / 720)
+local crtFont = love.graphics.newFont("assets/VT323-Regular.ttf", 72 * love.graphics.getHeight() / 720)
 
 local glowEffect = shine.glowsimple()
 glowEffect.min_luma = .3
@@ -78,7 +78,6 @@ faceStatic.grainsize = 1
 
 local faceCrtEffect = faceBlurEffect:chain(faceScanlineEffect):chain(faceStatic)
 
-
 local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite)
     if moan.showingMessage then
         text = text or moan.getPrintedText()
@@ -90,9 +89,9 @@ local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite)
             love.graphics.setFont(msgFont)
         end
         if moan.autoWrap then
-            love.graphics.print("##"..text, msgBox.x, msgBox.y)
+            love.graphics.print("##" .. text, msgBox.x, msgBox.y)
         else
-            love.graphics.printf("##"..text, msgBox.x, msgBox.y, msgBox.w)
+            love.graphics.printf("##" .. text, msgBox.x, msgBox.y, msgBox.w)
         end
 
         if moan.showingOptions then
@@ -116,7 +115,7 @@ end
 
 local moanDraw = function()
     drawMoan(nil, msgFont, { x = 0, y = 0, w = w, h = h },
-        { x = 0, y = 0 }, nextMsgSprite)
+            { x = 0, y = 0 }, nextMsgSprite)
 end
 
 local function draw()
@@ -133,16 +132,15 @@ local function draw()
     love.graphics.setCanvas(textboxCanvas)
     love.graphics.clear()
     love.graphics.setCanvas()
-    faceCrtEffect:draw(function() face:draw() end)
+    faceCrtEffect:draw(function()
+        face:draw()
+    end)
     crt:draw()
     faceCrtEffect:draw(function()
         gooi.draw "main_menu"
         gooi.draw()
     end)
+    moan.draw()
 end
-
-
-
-
 
 return draw

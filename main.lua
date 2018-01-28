@@ -42,7 +42,7 @@ end
 
 function advanceDialogue()
     if not parser.locked() then
-        if not moan.typing then
+        if not moan.typing and not moan.showingOptions then
             if coroutine.status(currentParser) ~= "dead" then
                 local success, msg = coroutine.resume(currentParser, script, currentParser)
                 print(success, msg)
@@ -69,7 +69,7 @@ function love.keypressed(key, scancode, isrepeat)
         advanceDialogue()
     end
     if key == "p" then
-        gui.paused()
+        gui.pause()
     end
 end
 
