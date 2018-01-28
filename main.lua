@@ -42,7 +42,7 @@ end
 
 function advanceDialogue()
     if not parser.locked() then
-        if not moan.typing and not moan.showingOptions then
+        if not moan.typing then
             if coroutine.status(currentParser) ~= "dead" then
                 local success, msg = coroutine.resume(currentParser, script, currentParser)
                 print(success, msg)
