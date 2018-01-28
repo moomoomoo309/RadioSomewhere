@@ -34,7 +34,6 @@ local function init()
 end
 
 function love.load()
-    moan.speak("", { "" })
     currentParser, script = parser.parse "assets.drinkingBuddyScript"
     parser.unlock()
     scheduler.resume "default"
@@ -88,6 +87,7 @@ end
 function love.update(dt)
     if atTitleScreen and not gui.currentMenu() then
         atTitleScreen = false
+        moan.speak("", { " I N C O M I N G  T R A N S M I S S I O N \n\n\n\n\t\t\t[SPACE TO CONTINUE]" })
     end
     scheduler.update(dt)
     if gui.currentMenu() ~= "pause" then

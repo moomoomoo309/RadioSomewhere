@@ -79,7 +79,7 @@ local function init()
         w = menuButtonWidth,
         h = menuButtonHeight,
         group = "main_menu",
-    })   :onRelease(function()
+    }):onRelease(function()
         gooi.setGroupVisible("main_menu", false)
         --Make sure that the settings are not visible on game start
         if settingsPanelComponents[1].visible then
@@ -109,7 +109,7 @@ local function init()
         w = menuButtonWidth,
         h = menuButtonHeight,
         group = "main_menu",
-    --icon = "imgs/exit.png"
+        --icon = "imgs/exit.png"
     }):onRelease(function(self)
         if self.visible then
             exitOpen = true
@@ -124,7 +124,7 @@ local function init()
                 group = "main_menu"
             }
         end
-    end)      :left()
+    end):left()
 
 
     --[[---------------------------
