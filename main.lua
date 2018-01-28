@@ -5,8 +5,7 @@ local moan = require "Moan"
 local drawMainScreen = require "mainScreen"
 local audioHandler = require "audioHandler"
 local gui = require "game-gui.gui"
-
-local gui = require "game-gui.gui"
+local scheduler = require "scheduler"
 
 io.stdout:setvbuf "no"
 
@@ -28,9 +27,10 @@ function init()
 end
 
 function love.load()
-    moan.speak("?", {""})
+    moan.speak("", { "" })
     currentParser, script = parser.parse "assets.drinkingBuddyScript"
     parser.unlock()
+    scheduler.resume "default"
 end
 
 function love.draw()
@@ -39,6 +39,7 @@ function love.draw()
 end
 
 function love.update(dt)
+    scheduler.update(dt)
     moan.update(dt)
     gooi.update(dt)
 end
@@ -48,18 +49,22 @@ function advanceDialogue()
         if not moan.typing then
             if coroutine.status(currentParser) ~= "dead" then
                 local success, msg = coroutine.resume(currentParser, script, currentParser)
-                print(success, msg)
+                if msg and #msg > 195 then
+                    print("msg too long!", msg:sub(1, 195), msg:sub(196))
+                end
                 if not success then
                     print(msg)
                 elseif msg then
-                    moan.speak("", {msg})
-                    moan.advanceMsg()
+                    moan.speak("", { msg })
+                    moan.keypressed "space"
+                else
+                    moan.keypressed "space"
                 end
             else
                 print "ded"
             end
         else
-            moan.advanceMsg()
+            moan.keypressed "space"
         end
     end
 end
@@ -70,6 +75,8 @@ function love.keypressed(key, scancode, isrepeat)
     end
     if key == "space" then
         advanceDialogue()
+    else
+        moan.keypressed(key)
     end
     if key == "p" then
         gui.pause()

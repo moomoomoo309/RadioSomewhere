@@ -44,7 +44,7 @@ local utf8 = require("utf8")
 -------------------------------------------------
 local Moan = {
     indicatorCharacter = ">",
-    optionCharacter = "=> ",
+    optionCharacter = " =>",
     indicatorDelay = 25,
     selectButton = "space",
     typeSpeed = 0.01,

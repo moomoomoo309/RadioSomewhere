@@ -85,10 +85,12 @@ local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite)
         if msgFont then
             love.graphics.setFont(msgFont)
         end
-        if moan.autoWrap then
-            love.graphics.print("~$:"..text, msgBox.x, msgBox.y)
-        else
-            love.graphics.printf("~$:"..text, msgBox.x, msgBox.y, msgBox.w)
+        if #text > 0 then
+            if moan.autoWrap then
+                love.graphics.print("##"..text, msgBox.x, msgBox.y)
+            else
+                love.graphics.printf("##"..text, msgBox.x, msgBox.y, msgBox.w)
+            end
         end
 
         if moan.showingOptions then

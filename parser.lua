@@ -2,6 +2,7 @@
 --- @module parser
 
 local moan = require "Moan"
+local scheduler = require "scheduler"
 
 local locked = true
 local parser = {}
@@ -50,13 +51,19 @@ local function newPromptPlayer(tbl, process)
     local option
     for k, v in pairs(tbl) do
         if v then
-            choices[k] = function() option = k end
+            choices[#choices + 1] = { k, function()
+                option = k
+                scheduler.after(.01, function()
+                    love.keypressed("space")
+                end)
+            end }
         end
     end
-    moan.speak("", nil, {options=choices})
+    moan.speak("", { "" }, { options = choices })
     repeat
         coroutine.yield() -- Until a choice is picked, don't go back to processVal.
     until option
+    moan.speak("", { "" })
     return tbl[option], option
 end
 
@@ -146,7 +153,6 @@ function parser.processVal(tbl, process, noYield)
                 parser.processLine(val, tbl, noYield)
             elseif t == "table" then
                 local option, text = newPromptPlayer(val, process)
-                parser.processLine(text, process, noYield)
                 parser.processVal(option, process, noYield)
             elseif t == "function" then
                 parser.processVal(val(val, tbl), process, noYield)
