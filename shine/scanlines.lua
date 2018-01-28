@@ -30,8 +30,10 @@ new = function(self)
 	self._opacity = 0.3
 	self._center_fade = 0.44
 	self._line_height = 0.35
+	self._y_offset = 0
 
 	self.canvas = love.graphics.newCanvas()
+
 	self.shader = love.graphics.newShader[[
 	#define PI (3.14159265)
 
@@ -43,6 +45,8 @@ new = function(self)
 	extern float center_fade;
 	// How much of each pixel is scanline, 0 to 1.
 	extern float scanline_height;
+	// The offset to use for the scanlines.
+	extern float y_offset;
 
 	// input coords 0 -> 1,
 	//   return coords -1 -> 1
@@ -61,6 +65,7 @@ new = function(self)
 
 	vec4 effect(vec4 vcolor, Image texture, vec2 texture_coords, vec2 pixel_coords)
 	{
+		pixel_coords.y = pixel_coords.y - y_offset;
 		vec4 working_rgb = Texel(texture, texture_coords);
 
 		// horizontal scanlines
@@ -98,6 +103,7 @@ new = function(self)
 	self.shader:send("opacity", self._opacity)
 	self.shader:send("center_fade", self._center_fade)
 	self.shader:send("scanline_height", self._line_height)
+	self.shader:send("y_offset", self._y_offset)
 end,
 
 draw = function(self, func, ...)
@@ -121,6 +127,10 @@ set = function(self, key, value)
 		assert(type(value) == "number")
 		self._line_height = value
 		self.shader:send("scanline_height", value)
+	elseif key == "y_offset" then
+		assert(type(value) == "number")
+		self._y_offset = value
+		self.shader:send("y_offset", value)
 	else
 		error("Unknown property: " .. tostring(key))
 	end

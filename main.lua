@@ -18,27 +18,62 @@ optionLocked = false
 
 io.stdout:setvbuf "no"
 
-
 local currentParser, script
 local atTitleScreen = true
 local titlecard = sprite {
-    x=0,
-    y=0,
-    w=w,
-    h=h,
+    x = 0,
+    y = 0,
+    w = w,
+    h = h,
     imagePath = "assets/titlecard.png"
 }
 
+local cancelMusicLoop
+
 local function init()
     gui.init()
+    parseScript "assets.drinkingBuddyScript"
+    cancelMusicLoop = audioHandler.loop("Openeraudio", nil, 0)
 end
 
 function love.load()
-    currentParser, script = parser.parse "assets.drinkingBuddyScript"
     parser.unlock()
     scheduler.resume "default"
     init()
 end
+
+function parseScript(path)
+    if not path then
+        currentParser, script = nil, nil
+        face:setImagePath("assets/fuzz.png", true)
+    end
+    currentParser, script = parser.parse(path)
+end
+
+remainingTransmissions = {
+    {"Lost Boy", function()
+        face:setImagePath("assets/oldlady.png", true)
+        cancelMusicLoop()
+        cancelMusicLoop = audioHandler.loop("Stardust Dreams")
+        parseScript("assets.lostBoyScript")
+        scheduler.after(.01, function() love.keypressed "space" end)
+    end},
+    {"Offer", function()
+        face:setImagePath("assets/noface.png", true)
+        cancelMusicLoop()
+        cancelMusicLoop = audioHandler.loop("consumartInSpace")
+        parseScript("assets.offerScript")
+        scheduler.after(.01, function() love.keypressed "space" end)
+    end},
+    {"Questions", function()
+        face:setImagePath("assets/girl.png", true)
+        cancelMusicLoop()
+        cancelMusicLoop = audioHandler.loop("Space Debris")
+        parseScript("assets.questionsScript")
+        scheduler.after(.01, function() love.keypressed "space" end)
+    end}
+}
+
 
 local function drawGame()
     if not atTitleScreen then
@@ -53,7 +88,7 @@ local function drawGame()
                 gooi.draw "main_menu"
                 love.graphics.push()
                 love.graphics.translate(120 * h / 720, 17 * h / 720)
-                love.graphics.shear(-.2,0)
+                love.graphics.shear(-.2, 0)
                 gooi.draw "main_menu_title"
                 love.graphics.pop()
             end)
@@ -74,8 +109,10 @@ local function drawGame()
     end
     if not gui.currentMenu() then
         gaussian:draw(function()
-            gooi.draw "main_game"
+            gooi.draw "database"
         end)
+        gooi.draw "main_game"
+
     end
 end
 
@@ -83,6 +120,7 @@ function love.draw()
     drawGame()
 end
 
+local scanlineSpeed = 3
 
 function love.update(dt)
     if atTitleScreen and not gui.currentMenu() then
@@ -94,18 +132,27 @@ function love.update(dt)
         moan.update(dt)
     end
     gooi.update(dt)
+    imageScanlineEffect:set("y_offset", imageScanlineEffect._y_offset + dt * scanlineSpeed)
+    textScanlineEffect:set("y_offset", textScanlineEffect._y_offset + dt * scanlineSpeed)
 end
 
+local firstRun = true
 function advanceDialogue()
     if not parser.locked() then
         if not moan.typing then
-            if coroutine.status(currentParser) ~= "dead" then
+            if currentParser and coroutine.status(currentParser) ~= "dead" then
+                if firstRun then
+                    cancelMusicLoop()
+                    cancelMusicLoop = audioHandler.loop "Mountain Goats Tallahassee instrumental cover"
+                    face:setImagePath("assets/thomas.png", true)
+                end
+                firstRun = false
                 local success, msg = coroutine.resume(currentParser, script, currentParser)
-                if msg and #msg > 195 then
+                if gameDebug and msg and #msg > 195 then
                     print("msg too long!", msg:sub(1, 195), "!", msg:sub(196))
                 end
                 if not success then
-                    print(msg)
+                    print("Error!", msg)
                 elseif msg then
                     moan.speak("", { msg })
                     moan.keypressed "space"
@@ -113,7 +160,15 @@ function advanceDialogue()
                     moan.keypressed "space"
                 end
             else
-                print "ded"
+                parser.lock()
+                scheduler.after(.75, parser.unlock)
+                if not moan.showingOptions then
+                    moan.speak("", {"Select Incoming Transmission:"}, {options=remainingTransmissions})
+                    moan.speak("", {""})
+                end
+                if not currentParser then
+                    moan.keypressed "space"
+                end
             end
         else
             moan.keypressed "space"

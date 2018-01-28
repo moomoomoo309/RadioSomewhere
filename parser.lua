@@ -25,7 +25,7 @@ local function promptPlayer(tbl, process)
         end
     end
     optionLocked = true
-    scheduler.after(.75, function() optionLocked = false end)
+    scheduler.after(.75, function() optionLocked = false end, "pausable")
     moan.speak("", { "" }, { options = choices })
     repeat
         coroutine.yield() -- Until a choice is picked, don't go back to processVal.
@@ -150,6 +150,9 @@ end
 --- @tparam string path The path to the file to parse.
 --- @treturn coroutine,table|false A coroutine to the parser and the table it's reading from, or false if it is unsuccessful.
 function parser.parse(path)
+    if not path then
+        error()
+    end
     local processTbl = require(path)
     if type(processTbl) == "table" then
         return coroutine.create(parser.processVal), processTbl

@@ -58,7 +58,11 @@ return {
             "#uwsss: Yeah. Send it over",
             "#thomas: Thanks for everything space man.",
             "#uwsss: You’re welcome Thomas.",
-            "  T R A N S M I S S I O N        O V E R",
+            function(val, tbl)
+                --TODO: Add carl's letter to the database
+                parseScript()
+                return "  T R A N S M I S S I O N        O V E R"
+            end,
         },
     },
 }

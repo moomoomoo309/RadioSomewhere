@@ -12,22 +12,25 @@ local menuButtonHeight = height / 16
 local menuButtonWidth = width / 10
 
 local settingsPanelComponents
+local contactsPanel
+local contactsTable = {}
+local pauseLabel
+local startBtn
+local databaseBtn
 local fontColor = { 255, 255, 255 }
 
-gameDebug = true
+gameDebug = false
 local paused = false
 exitOpen = false
 
 gooi.setStyle({ font = love.graphics.newFont("assets/VT323-Regular.ttf", 30 * height / 720) })
-
-local pauseLabel
 
 --- Pause toggle menu
 --- @return nil
 local function togglePause()
     paused = not paused
     pauseLabel:setVisible(paused)
-    print(paused)
+    scheduler[paused and "pause" or "resume"] "pausable"
 end
 
 --- Visibility toggle for the settings screen
@@ -38,17 +41,55 @@ local function toggleVisible()
     end
 end
 
-local startBtn
-local databaseBtn
-
 function startBlinking()
-    return scheduler.every(.8,function()
+    return scheduler.every(.8, function()
         if databaseBtn.style.bgColor[4] == 0 then
             databaseBtn.events.hover(databaseBtn)
         else
             databaseBtn.events.unhover(databaseBtn)
         end
+    end, nil, "pausable")
+end
+
+local function backOutOfFiles(person)
+    if contactsTable[person] then
+        for i = 1,#contactsTable[person] do
+            contactsTable[person].sons[1].ref:setVisible(false)
+        end
+    end
+end
+
+local function addContact(person)
+    contactsTable[person] = gooi.newPanel({
+        x = width * 300 / 960,
+        y = height * 60 / 540,
+        w = width * 200 / 960,
+        h = height * 250 / 540,
+        group = "main_game",
+        layout = "grid 4x1"
+    }):add(gooi.newButton({text = "Back", group = "main_game"})):onRelease(function()
+        backOutOfFiles(person)
     end)
+    contactsTable[person].sons[1].ref:setVisible(false)
+end
+
+--- Adds "file" to person subdirect
+---
+---
+local function addFile(person, fileName)
+    if contactsPanel then
+        for i = 1, #contactsPanel.sons do
+            if contactsPanel.sons[i].ref.text == person and contactsTable[person] then
+                contactsTable[person]:add{text = fileName, group = "main_game"}
+                :onRelease(function()
+                         --TODO: the needful
+                end)
+            else
+                addContact(person)
+                contactsPanel:add(gooi.newButton({text = person, group = "main_game"}))
+            end
+        end
+    end
 end
 
 --- Initializer to create all the gui objects
@@ -85,7 +126,7 @@ local function init()
         if settingsPanelComponents[1].visible then
             toggleVisible()
         end
-    end) :left()
+    end):left()
 
     startBtn.textColor = fontColor
 
@@ -109,7 +150,7 @@ local function init()
         w = menuButtonWidth,
         h = menuButtonHeight,
         group = "main_menu",
-        --icon = "imgs/exit.png"
+    --icon = "imgs/exit.png"
     }):onRelease(function(self)
         if self.visible then
             exitOpen = true
@@ -208,9 +249,9 @@ local function init()
         settingsPanelComponents[i].visible = false
     end
 
-    --[[---------------------------------
-    -------Pause Menu Generator----------
-    ------------------------------------]]
+    --[[------------------------------------
+    ----------Pause Menu Generator----------
+    ---------------------------------------]]
 
     pauseLabel = gooi.newLabel({
         text = "Paused",
@@ -221,60 +262,236 @@ local function init()
         group = "pause"
     })
 
-    --[[------------------------------
-    ------------Game Buttons----------
-    ---------------------------------]]
+    --[[--------------------------------
+    -------------Game Buttons-----------
+    -----------------------------------]]
 
 
     --main_game
+
+    local filePanel = gooi.newPanel({
+        x = width * 300 / 960,
+        y = height * 60 / 540,
+        w = width * 200 / 960,
+        h = height * 250 / 540,
+        group = "main_game",
+        layout = "grid 5x3"
+    }):setStyle({ bgColor = component.colors.green })
+
+    local savedFilesPanel
+    local contactsBtn
+    local savedFilesBtn
+
+    local savedFilesBtn = gooi.newButton({
+        text = "Saved Files",
+        x = width * 460 / 960,
+        y = height * 30 / 540,
+        w = width * 100 / 960,
+        h = height * 30 / 540,
+        group = "main_game"
+    })
+
+    local contactsBtn = gooi.newButton({
+        text = "Contacts",
+        x = width * 300 / 960,
+        y = height * 30 / 540,
+        w = width * 100 / 960,
+        h = height * 30 / 540,
+        group = "main_game"
+    })
+
+    local function savedFilesVisibility()
+        for i = 1, #savedFilesPanel.sons do
+            savedFilesPanel.sons[i].ref:setVisible(not savedFilesPanel.sons[i].ref.visible)
+        end
+    end
+
+    local function fileViewerVisibility()
+        for i = 1, #filePanel.sons do
+            filePanel.sons[i].ref:setVisible(not filePanel.sons[i].ref.visible)
+        end
+    end
+
+    local function contactsVisibility()
+        for i = 1, #contactsPanel.sons do
+           contactsPanel.sons[i].ref:setVisible(not contactsPanel.sons[1].ref.visible)
+        end
+    end
+
+    local function switchToSaveFiles()
+        if not filePanel.sons[1].ref.visible and not savedFilesPanel.sons[1].ref.visible and savedFilesBtn.visible then
+            savedFilesVisibility()
+        end
+    end
+
+    contactsPanel = gooi.newPanel({
+        x = width * 330 / 960,
+        y = height * 90 / 540,
+        w = width * 200 / 960,
+        h = height * 200 / 540,
+        group = "main_game",
+        layout = "grid 4x1"
+    }):add(gooi.newButton({text = "chris"}))
+
+    for k,v in pairs (contactsPanel.sons) do
+        print(k, v)
+    end
+
+
+    local function switchToContacts()
+        if not contactsPanel.sons[1].ref.visible and contactsBtn.visible then
+            contactsVisibility()
+        end
+    end
+
+    local function displayFile(text)
+        text = text or "hi"
+        filePanel.sons[3].ref:setText(text)
+        savedFilesVisibility()
+        fileViewerVisibility()
+    end
+
+    contactsBtn:onRelease(function ()
+        switchToContacts()
+    end):setVisible(false)
+
+    savedFilesBtn:onRelease(function()
+        switchToSaveFiles()
+    end):setVisible(false)
+
     databaseBtn = gooi.newButton({
         text = "",
         x = width * 905 / 960,
         y = height * 303 / 960,
         w = width * 40 / 960,
         h = height * 40 / 960,
-        group = "main_game"
+        group = "database"
     }):setStyle({ bgColor = component.colors.blue, radius = height * 40 / 960 })
-    :onRelease(function()
-        --Do the needful
+                      :onRelease(function()
+        if filePanel.sons[1].ref.visible or savedFilesPanel.sons[1].ref.visible or contactsBtn.visible or savedFilesBtn.visible then
+            if filePanel.sons[1].ref.visible then
+                fileViewerVisibility()
+            end
+            if savedFilesPanel.sons[1].ref.visible then
+                savedFilesVisibility()
+            end
+        else
+            savedFilesVisibility()
+        end
     end)
 
     databaseBtn.events.hover = function(self)
-        self.style.bgColor = {180, 0, 255}
+        self.style.bgColor = { 180, 0, 255 }
     end
     databaseBtn.events.unhover = function(self)
         self.style.bgColor = component.colors.blue
     end
 
-    contactsPanel = gooi.newPanel({
-        x = width * 300 / 960,
-        y = height * 130 / 540,
-        w = width / 4,
-        h = height / 3,
-        layout = "grid 4x3"})
+    local databaseLbl = gooi.newLabel({
+        text = "Database",
+        x = width * 400 / 960,
+        y = height * 200 / 340,
+    })
+
+
+    filePanel:setColspan(1, 1, 2)
+    filePanel:setColspan(2, 1, 3)
+    filePanel:setRowspan(2, 1, 3)
+    filePanel:add(
+            gooi.newLabel({ text = "filler", group = "main_game" }):setStyle({ bgColor = component.colors.green }),
+            gooi.newButton({ text = "X", group = "main_game" }):onRelease(function()
+                fileViewerVisibility()
+                savedFilesVisibility()
+            end)
+                :setStyle({ bgColor = component.colors.green
+            }),
+            gooi.newLabel({ text = "", group = "main_game" }):setStyle({ bgColor = component.colors.green }),
+            gooi.newButton({ text = "Left", group = "main_game" }):onRelease(function()
+            end)
+                :setStyle({ bgColor = component.colors.green
+            }),
+            gooi.newLabel({ text = "filler", group = "main_game" }):setStyle({ bgColor = component.colors.green }),
+            gooi.newButton({ text = "Right", group = "main_game" }):onRelease(function()
+            end)
+                :setStyle({ bgColor = component.colors.green
+            })
+    )
+    fileViewerVisibility()
 
     savedFilesPanel = gooi.newPanel({
-        x = width * 300 / 960,
-        y = height * 130 / 540,
-        w = width / 4,
-        h = height / 3,
-        layout = "grid 4x3"})
+        x = width * 330 / 960,
+        y = height * 90 / 540,
+        w = width * 200 / 960,
+        h = height * 200 / 540,
+        group = "main_game",
+        layout = "grid 5x3"
+    })
 
-    contactsBtn = gooi.newButton({text = "Contacts",
-                                  x = height / 2,
-                                  y = height / 2,
-                                  w = height / 2,
-                                  h = height / 2,
-                                  group = "main_game"
-    }):onRelease()
+    savedFilesPanel:setColspan(1, 1, 3)
+    savedFilesPanel:add(
+            gooi.newLabel({ text = "Saved Files", group = "main_game" }):center(),
+            gooi                      .newButton({
+                text = "1",
+                group = "main_game" }):onRelease(function(self)
+                displayFile()
 
-    savedFilesBtn = gooi.newButton({text = "Saved Files",
-                                    x = height / 2,
-                                    y = height / 2,
-                                    w = height / 2,
-                                    h = height / 2,
-                                    group = "main_game"
-    }):onRelease()
+            end),
+            gooi                      .newButton({
+                text = "2",
+                group = "main_game" }):onRelease(function(self)
+                displayFile()
+
+            end),
+            gooi                      .newButton({
+                text = "3",
+                group = "main_game" }):onRelease(function(self)
+                displayFile()
+
+            end),
+            gooi                      .newButton({
+                text = "4",
+                group = "main_game" }):onRelease(function(self)
+                displayFile()
+
+            end),
+            gooi                      .newButton({
+                text = "5",
+                group = "main_game" }):onRelease(function(self)
+                displayFile("hello")
+
+            end),
+            gooi                      .newButton({
+                text = "6",
+                group = "main_game" }):onRelease(function(self)
+                displayFile()
+
+            end),
+            gooi                      .newButton({
+                text = "7",
+                group = "main_game" }):onRelease(function(self)
+                displayFile()
+
+            end),
+            gooi                      .newButton({
+                text = "8",
+                group = "main_game" }):onRelease(function(self)
+                displayFile()
+
+            end),
+            gooi                      .newButton({
+                text = "9",
+                group = "main_game" }):onRelease(function(self)
+                displayFile()
+
+            end),
+            gooi.newButton({ text = "Left", group = "main_game" }),
+            gooi.newLabel({ text = "", group = "main_game" }),
+            gooi.newButton({ text = "Right", group = "main_game" })
+    )
+
+
+    savedFilesVisibility()
+
 end
 
 local function currentMenu()

@@ -27,12 +27,12 @@ local crt = sprite {
     filterMax = "linear"
 }
 
-local face = sprite {
+face = sprite {
     x = 0,
     y = 0,
     w = love.graphics.getWidth(),
     h = love.graphics.getHeight(),
-    imagePath = "assets/face1.png",
+    imagePath = "assets/fuzz.png",
     filterMin = "linear",
     filterMax = "linear"
 }
@@ -43,10 +43,11 @@ local crtFont = love.graphics.newFont("assets/VT323-Regular.ttf", 72*love.graphi
 
 local glowEffect = shine.glowsimple()
 glowEffect.min_luma = .3 * h / 1080
-local scanlineEffect = shine.scanlines()
-scanlineEffect.opacity = .5
-scanlineEffect.line_height = .4
-scanlineEffect.pixel_size = 9 * h^2 / 1080^2
+textScanlineEffect = shine.scanlines()
+textScanlineEffect.opacity = .5
+textScanlineEffect.line_height = .333333
+textScanlineEffect.pixel_size = 9 * h^2 / 1080^2
+textScanlineEffect.center_fade = 0
 local boxblur = shine.boxblur()
 boxblur.radius_h = 2 * h / 1080
 boxblur.radius_v = 2 * h / 1080
@@ -58,12 +59,12 @@ local titleFont = crtFont
 local msgFont = crtFont
 local nextMsgSprite
 
-textShader = boxblur:chain(glowEffect):chain(scanlineEffect):chain(static)
+textShader = boxblur:chain(glowEffect):chain(textScanlineEffect):chain(static)
 
-local faceScanlineEffect = shine.scanlines()
-faceScanlineEffect.opacity = .5
-faceScanlineEffect.line_height = .3
-faceScanlineEffect.pixel_size = math.ceil(1440 / h^.9)
+imageScanlineEffect = shine.scanlines()
+imageScanlineEffect.opacity = .5
+imageScanlineEffect.line_height = .333333
+imageScanlineEffect.pixel_size = math.ceil(1440 / h^.9)
 
 local faceBlurEffect = shine.boxblur()
 faceBlurEffect.radius_h = 1.5 * h / 1080
@@ -73,7 +74,7 @@ local faceStatic = shine.filmgrain()
 faceStatic.opacity = .15
 faceStatic.grainsize = 1 * h / 1080
 
-imageShader = faceBlurEffect:chain(faceScanlineEffect):chain(faceStatic)
+imageShader = faceBlurEffect:chain(faceStatic):chain(imageScanlineEffect)
 
 local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite)
     if moan.showingMessage then
@@ -98,7 +99,7 @@ local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite)
             local currentFont = msgFont or titleFont or love.graphics.getFont()
             local padding = currentFont:getHeight() * 1.35
             for k, option in pairs(moan.allMsgs[moan.currentMsgInstance].options) do
-                love.graphics.print(option[1], optionsPos.x, optionsPos.y + ((k - 1) * padding))
+                love.graphics.print(option[1], optionsPos.x, optionsPos.y + ((k - (text and #text>0 and 0 or 1)) * padding))
             end
         end
 

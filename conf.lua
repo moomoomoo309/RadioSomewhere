@@ -16,4 +16,5 @@ function love.conf(t)
     local w, h = unpack(readFromFile("currentResolution.txt"))
     t.window.width = w
     t.window.height = h
+    t.version = "0.10.2"
 end

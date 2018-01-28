@@ -285,7 +285,7 @@ end
 --- Sets the imagePath of a sprite, updating its image and animations accordingly.
 --- @tparam string imagePath The path to the image file.
 --- @return nil
-function sprite:setImagePath(imagePath)
+function sprite:setImagePath(imagePath, override)
     assert(type(imagePath) == "string", ("String expected, got %s."):format(type(imagePath)))
     if not love.filesystem.exists(imagePath) then
         return
@@ -319,7 +319,7 @@ function sprite:setImagePath(imagePath)
             spriteSheet:setFilter(self.filterMin, self.filterMax, self.anisotropy) --If for some reason, nearest isn't wanted.
         end
     end
-    self.image = self.image or spriteSheet --If it was user-overridden, keep it!
+    self.image = not override and self.image or spriteSheet --If it was user-overridden, keep it!
     local success, metaFile = false, nil
     if self.animPath then
         if love.filesystem.exists(self.animPath) then

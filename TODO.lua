@@ -5,13 +5,13 @@
     --Maybe we should ask Karina for a futuristic "window" asset, like for an OS?
     --Files should have an exit file and an optional next/prev button
 --TODO: Saved files
-    --Each saved file will have this, so you might want to just make a function to make the buttons
-    --Needs to be implemented with buttons
+    --DONE: Each saved file will have this, so you might want to just make a function to make the buttons
+    --DONE: Needs to be implemented with buttons
 --TODO: Contact files
     --Contact files should cause the database button to blink
         --DONE: Maybe blinking should just be a bool?
     --Perhaps the contact files should have an exclamation point next to it or something like that?
-
+--TODO: Implement audio
 
 
 

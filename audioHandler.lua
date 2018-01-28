@@ -2,7 +2,6 @@
 --- @classmod audioHandler
 
 local scheduler = require "scheduler"
-local loader = require "love-loader.love-loader"
 
 local audioHandler
 
@@ -91,25 +90,44 @@ function audioHandler.play(fileName, callback)
     return cancel
 end
 
+local function cosInterp(start, stop, percentProgress)
+    local f = (1 - math.cos(percentProgress * math.pi)) / 2
+    return start * (1 - f) + stop * f
+end
+
 --- Loops the audio object with the given name from the audio handler, if it exists. Returns a function to stop playing the audio file.
 ---@tparam string fileName The name of the file to play.
---- @tparam function|nil callback (Optional) A callback to run when the file loops.
+---@tparam function|nil callback (Optional) A callback to run when the file loops.
 ---@treturn function A function which will cancel the playing of this file. If a truthy value is passed and callback is a function, it will also be run.
-function audioHandler.loop(fileName, callback)
+function audioHandler.loop(fileName, callback, startTime)
+    startTime = startTime or 1.5
     local audioObj = audioHandler.audioObjs[fileName]
+    local function play(audioObj)
+        scheduler.after(startTime, function()
+            audioObj:play()
+            audioObj:setVolume(0)
+            scheduler.before(3, function(timeElapsed)
+                audioObj:setVolume(cosInterp(0, 1, timeElapsed / 3))
+            end, nil, "pausable")
+        end, "pausable")
+    end
     if audioObj then
-        audioObj:play()
+        play(audioObj)
     else
         error(("No audio file with filename %s found."):format(fileName))
     end
     local cancelFct = scheduler.everyCondition(function()
         return audioObj:isStopped()
     end, function()
-        audioObj:play()
+        play(audioObj)
     end, function()
-        audioObj:stop()
+        scheduler.before(3, function(timeElapsed)
+            audioObj:setVolume(cosInterp(1, 0, timeElapsed / 3))
+            cosInterp(1, 0, timeElapsed / 3)
+        end)
+        scheduler.after(3, function() audioObj:stop() end)
         audioHandler.playing[fileName] = nil
-    end)
+    end, "pausable")
     local cancel = function(runCallback)
         cancelFct()
         if runCallback and type(callback) == "function" then
