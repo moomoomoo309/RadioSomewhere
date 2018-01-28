@@ -13,41 +13,6 @@ local parser = {}
 --- @treturn string The choice the player picked.
 local function promptPlayer(tbl, process)
     local choices = {}
-    for k, v in pairs(tbl) do
-        if v then
-            choices[k] = v
-        end
-    end
-    local buttons = {}
-    local function clearButtons()
-        for i = 1, #buttons do
-            buttons[i].visible = false
-            buttons[i] = nil
-        end
-        buttons = nil
-    end
-
-    local choice, option
-    for k in pairs(choices) do
-        local btn = gooi.newButton { text = k:sub(9) }:onRelease(function(self)
-            self.text = "#uwsss: " .. self.text
-            option = self.text
-            choice = choices[self.text]
-            clearButtons()
-            coroutine.resume(process)
-        end)
-        btn.x = love.graphics.getWidth() / 2 - btn.w / 2
-        btn.y = love.graphics.getHeight() / 2 - btn.h * 1.05 * (#buttons - #choices / 2)
-        buttons[#buttons + 1] = btn
-    end
-    repeat
-        coroutine.yield() -- Until a choice is picked, don't go back to processVal.
-    until choice
-    return choice, option
-end
-
-local function newPromptPlayer(tbl, process)
-    local choices = {}
     local option
     for k, v in pairs(tbl) do
         if v then
@@ -59,6 +24,8 @@ local function newPromptPlayer(tbl, process)
             end }
         end
     end
+    optionLocked = true
+    scheduler.after(.5, function() optionLocked = false end)
     moan.speak("", { "" }, { options = choices })
     repeat
         coroutine.yield() -- Until a choice is picked, don't go back to processVal.
@@ -152,7 +119,7 @@ function parser.processVal(tbl, process, noYield)
             if t == "string" then
                 parser.processLine(val, tbl, noYield)
             elseif t == "table" then
-                local option, text = newPromptPlayer(val, process)
+                local option, text = promptPlayer(val, process)
                 parser.processVal(option, process, noYield)
             elseif t == "function" then
                 parser.processVal(val(val, tbl), process, noYield)

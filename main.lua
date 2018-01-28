@@ -6,23 +6,26 @@ local drawMainScreen = require "mainScreen"
 local audioHandler = require "audioHandler"
 local gui = require "game-gui.gui"
 local scheduler = require "scheduler"
+local sprite = require "sprite"
+
+local w, h = love.graphics.getDimensions()
+
+optionLocked = false
 
 io.stdout:setvbuf "no"
 
-gui.init()
-
-local function randomstring(len)
-    local str = {}
-    for i = 1, len do
-        str[i] = string.char(string.byte "A" + math.floor(math.random(0, 25)))
-    end
-    return table.concat(str)
-end
 
 local currentParser, script
+local atTitleScreen = true
+local titlecard = sprite {
+    x=0,
+    y=0,
+    w=w,
+    h=h,
+    imagePath = "assets/titlecard.png"
+}
 
-gui.init()
-function init()
+local function init()
     gui.init()
 end
 
@@ -31,14 +34,23 @@ function love.load()
     currentParser, script = parser.parse "assets.drinkingBuddyScript"
     parser.unlock()
     scheduler.resume "default"
+    init()
 end
 
 function love.draw()
-    drawMainScreen()
+    if not atTitleScreen then
+        drawMainScreen()
+    else
+        titlecard:draw()
+        gooi.draw "main_menu"
+    end
     gooi.draw()
 end
 
 function love.update(dt)
+    if atTitleScreen and not gui.currentMenu() then
+        atTitleScreen = false
+    end
     scheduler.update(dt)
     moan.update(dt)
     gooi.update(dt)
@@ -50,7 +62,7 @@ function advanceDialogue()
             if coroutine.status(currentParser) ~= "dead" then
                 local success, msg = coroutine.resume(currentParser, script, currentParser)
                 if msg and #msg > 195 then
-                    print("msg too long!", msg:sub(1, 195), msg:sub(196))
+                    print("msg too long!", msg:sub(1, 195), "!", msg:sub(196))
                 end
                 if not success then
                     print(msg)
@@ -70,16 +82,20 @@ function advanceDialogue()
 end
 
 function love.keypressed(key, scancode, isrepeat)
-    if key == "escape" then
-        love.event.quit()
-    end
-    if key == "space" then
-        advanceDialogue()
-    else
-        moan.keypressed(key)
-    end
-    if key == "p" then
-        gui.pause()
+    if not atTitleScreen then
+        if key == "escape" then
+            love.event.quit()
+        end
+        if not optionLocked then
+            if key == "space" then
+                advanceDialogue()
+            else
+                moan.keypressed(key)
+            end
+        end
+        if key == "p" then
+            gui.pause()
+        end
     end
 end
 
