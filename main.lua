@@ -7,8 +7,12 @@ local audioHandler = require "audioHandler"
 local gui = require "game-gui.gui"
 local scheduler = require "scheduler"
 local sprite = require "sprite"
+local shine = require "shine"
 
 local w, h = love.graphics.getDimensions()
+
+local gaussian = shine.gaussianblur()
+gaussian.sigma = 20
 
 optionLocked = false
 
@@ -37,22 +41,58 @@ function love.load()
     init()
 end
 
-function love.draw()
+local function drawGame()
     if not atTitleScreen then
         drawMainScreen()
+        if gui.currentMenu() == "pause" then
+            gooi.draw "pause"
+        end
     else
-        titlecard:draw()
-        gooi.draw "main_menu"
+        if gui.currentMenu() == "main_menu" then
+            titlecard:draw()
+            textShader:draw(function()
+                gooi.draw "main_menu"
+                love.graphics.push()
+                love.graphics.translate(120 * h / 720, 17 * h / 720)
+                love.graphics.shear(-.2,0)
+                gooi.draw "main_menu_title"
+                love.graphics.pop()
+            end)
+        end
+        imageShader:draw(function()
+            love.graphics.push()
+            love.graphics.shear(-.055, -.03)
+            love.graphics.rotate(math.rad(-2))
+            love.graphics.translate(30 * h / 1080, 35 * h / 1080)
+            gooi.draw "settings"
+            love.graphics.pop()
+        end)
     end
-    gooi.draw()
+    if exitOpen then
+        imageShader:draw(function()
+            gooi.draw()
+        end)
+    end
+    if not gui.currentMenu() then
+        gaussian:draw(function()
+            gooi.draw "main_game"
+        end)
+    end
 end
+
+function love.draw()
+    drawGame()
+end
+
 
 function love.update(dt)
     if atTitleScreen and not gui.currentMenu() then
         atTitleScreen = false
     end
     scheduler.update(dt)
-    moan.update(dt)
+    if gui.currentMenu() ~= "pause" then
+        moan.update(dt)
+    end
     gooi.update(dt)
 end
 
@@ -93,8 +133,9 @@ function love.keypressed(key, scancode, isrepeat)
                 moan.keypressed(key)
             end
         end
-        if key == "p" then
-            gui.pause()
+        local currentMenu = gui.currentMenu()
+        if key == "p" and currentMenu ~= "main_menu" and currentMenu ~= "settings" then
+            gui.togglePause()
         end
     end
 end

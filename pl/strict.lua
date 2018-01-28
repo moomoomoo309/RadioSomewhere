@@ -14,7 +14,7 @@
 -- @module pl.strict
 
 require 'debug' -- for Lua 5.2
-local getinfo, error, rawset, rawget = debug.getinfo, error, rawset, rawget
+local getinfo, error, rawset, rawget = gameDebug.getinfo, error, rawset, rawget
 local strict = {}
 
 local function what ()

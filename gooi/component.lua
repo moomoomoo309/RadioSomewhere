@@ -12,7 +12,7 @@ component.colors = {
     clearGray = {247, 247, 247, 255},
     darkGray = {41, 43, 44, 255},
     darkGrayAlpha = {41, 43, 44, 150},
-    purple = {201, 139, 203, 0}
+    purple = {211, 129, 213, 255}
 }
 component.style = {
     bgColor = component.colors.blue,

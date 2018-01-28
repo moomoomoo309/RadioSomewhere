@@ -42,38 +42,38 @@ local textboxCanvas = love.graphics.newCanvas(w, h)
 local crtFont = love.graphics.newFont("assets/VT323-Regular.ttf", 72*love.graphics.getHeight() / 720)
 
 local glowEffect = shine.glowsimple()
-glowEffect.min_luma = .3
+glowEffect.min_luma = .3 * h / 1080
 local scanlineEffect = shine.scanlines()
 scanlineEffect.opacity = .5
 scanlineEffect.line_height = .4
-scanlineEffect.pixel_size = 9
+scanlineEffect.pixel_size = 9 * h^2 / 1080^2
 local boxblur = shine.boxblur()
-boxblur.radius_h = 3
-boxblur.radius_v = 3
+boxblur.radius_h = 2 * h / 1080
+boxblur.radius_v = 2 * h / 1080
 local static = shine.filmgrain()
 static.opacity = .2
-static.grainsize = 2
+static.grainsize = 2 * h / 1080
 
 local titleFont = crtFont
 local msgFont = crtFont
 local nextMsgSprite
 
-local fullCrtEffect = boxblur:chain(glowEffect):chain(scanlineEffect):chain(static)
+textShader = boxblur:chain(glowEffect):chain(scanlineEffect):chain(static)
 
 local faceScanlineEffect = shine.scanlines()
 faceScanlineEffect.opacity = .5
 faceScanlineEffect.line_height = .3
-faceScanlineEffect.pixel_size = 3
+faceScanlineEffect.pixel_size = math.ceil(1440 / h^.9)
 
 local faceBlurEffect = shine.boxblur()
-faceBlurEffect.radius_h = 1.5
-faceBlurEffect.radius_v = 1.5
+faceBlurEffect.radius_h = 1.5 * h / 1080
+faceBlurEffect.radius_v = 1.5 * h / 1080
 
 local faceStatic = shine.filmgrain()
 faceStatic.opacity = .15
-faceStatic.grainsize = 1
+faceStatic.grainsize = 1 * h / 1080
 
-local faceCrtEffect = faceBlurEffect:chain(faceScanlineEffect):chain(faceStatic)
+imageShader = faceBlurEffect:chain(faceScanlineEffect):chain(faceStatic)
 
 local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite)
     if moan.showingMessage then
@@ -86,10 +86,11 @@ local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite)
             love.graphics.setFont(msgFont)
         end
         if #text > 0 then
+            local padStr = text:sub(1,1) == "#" and "##" or "  "
             if moan.autoWrap then
-                love.graphics.print("##"..text, msgBox.x, msgBox.y)
+                love.graphics.print(padStr..text, msgBox.x, msgBox.y)
             else
-                love.graphics.printf("##"..text, msgBox.x, msgBox.y, msgBox.w)
+                love.graphics.printf(padStr..text, msgBox.x, msgBox.y, msgBox.w)
             end
         end
 
@@ -120,7 +121,7 @@ end
 local function draw()
     console:draw()
     love.graphics.setCanvas(textboxCanvas)
-    fullCrtEffect:draw(function()
+    textShader:draw(function()
         love.graphics.push()
         love.graphics.scale(1, 2)
         moanDraw()
@@ -131,14 +132,10 @@ local function draw()
     love.graphics.setCanvas(textboxCanvas)
     love.graphics.clear()
     love.graphics.setCanvas()
-    faceCrtEffect:draw(function()
+    imageShader:draw(function()
         face:draw()
     end)
     crt:draw()
-    faceCrtEffect:draw(function()
-        gooi.draw "main_menu"
-        gooi.draw()
-    end)
 end
 
 return draw

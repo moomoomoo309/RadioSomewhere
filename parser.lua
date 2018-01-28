@@ -19,13 +19,13 @@ local function promptPlayer(tbl, process)
             choices[#choices + 1] = { k, function()
                 option = k
                 scheduler.after(.01, function()
-                    love.keypressed("space")
+                    love.keypressed "space"
                 end)
             end }
         end
     end
     optionLocked = true
-    scheduler.after(.5, function() optionLocked = false end)
+    scheduler.after(.75, function() optionLocked = false end)
     moan.speak("", { "" }, { options = choices })
     repeat
         coroutine.yield() -- Until a choice is picked, don't go back to processVal.

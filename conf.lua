@@ -13,8 +13,7 @@ local function readFromFile(file)
 end
 
 function love.conf(t)
-    w, h = unpack(readFromFile("currentResolution.txt"))
-    print(w)
+    local w, h = unpack(readFromFile("currentResolution.txt"))
     t.window.width = w
     t.window.height = h
 end
