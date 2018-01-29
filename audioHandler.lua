@@ -199,6 +199,7 @@ end
 
 --Add them all
 for name in pairs(files.names) do
+    print(("%s/%s.%s"):format(audioDir, name, files.extensions[name]), name)
     audioHandler.add(("%s/%s.%s"):format(audioDir, name, files.extensions[name]), name)
 end
 files = nil

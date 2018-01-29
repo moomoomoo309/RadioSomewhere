@@ -25,8 +25,19 @@ local titlecard = sprite {
     y = 0,
     w = w,
     h = h,
-    imagePath = "assets/titlecard.png"
+    imagePath = "assets/titlecardemptycrt.png"
 }
+
+local titlecardStatic = sprite {
+    x=0,
+    y=0,
+    w=w,
+    h=h,
+    imagePath = "assets/titlecardstatic.png"
+}
+local titlecardStaticNoiseShader = shine.noise()
+scheduler.everyCondition(function() return titlecardStatic.visible end, function() titlecardStaticNoiseShader:set("iTime", love.timer.getTime()*1000) end)
+staticShader = titlecardStaticNoiseShader:chain(imageScanlineEffect)
 
 local cancelMusicLoop
 
@@ -46,12 +57,16 @@ function parseScript(path)
     if not path then
         currentParser, script = nil, nil
         face:setImagePath("assets/fuzz.png", true)
+        moan.speak("", {""})
     end
     currentParser, script = parser.parse(path)
 end
 
+local picked = false
+
 remainingTransmissions = {
     {"Lost Boy", function()
+        print "Lost boy picked!"
         face:setImagePath("assets/oldlady.png", true)
         cancelMusicLoop()
         cancelMusicLoop = audioHandler.loop("Stardust Dreams")
@@ -59,13 +74,19 @@ remainingTransmissions = {
         scheduler.after(.01, function() love.keypressed "space" end)
     end},
     {"Offer", function()
-        face:setImagePath("assets/noface.png", true)
-        cancelMusicLoop()
-        cancelMusicLoop = audioHandler.loop("consumartInSpace")
-        parseScript("assets.offerScript")
-        scheduler.after(.01, function() love.keypressed "space" end)
+        if not picked then
+            picked = true
+            print "Offer picked!"
+            face:setImagePath("assets/noface.png", true)
+            cancelMusicLoop()
+            cancelMusicLoop = audioHandler.loop("consumartInSpace")
+            parseScript("assets.offerScript")
+            scheduler.after(.01, function() love.keypressed "space" end)
+
+        end
     end},
     {"Questions", function()
+        print "Questions picked!"
         face:setImagePath("assets/girl.png", true)
         cancelMusicLoop()
         cancelMusicLoop = audioHandler.loop("Space Debris")
@@ -84,6 +105,11 @@ local function drawGame()
     else
         if gui.currentMenu() == "main_menu" then
             titlecard:draw()
+            local oldColor = {love.graphics.getColor()}
+            love.graphics.setColor(oldColor[1], oldColor[2], oldColor[3], 128)
+            titlecardStatic:draw()
+            staticShader:draw(function() titlecardStatic:draw() end)
+            love.graphics.setColor(oldColor)
             textShader:draw(function()
                 gooi.draw "main_menu"
                 love.graphics.push()
@@ -152,23 +178,26 @@ function advanceDialogue()
                     print("msg too long!", msg:sub(1, 195), "!", msg:sub(196))
                 end
                 if not success then
-                    print("Error!", msg)
+                    print("Error!", success, msg)
                 elseif msg then
                     moan.speak("", { msg })
                     moan.keypressed "space"
                 else
                     moan.keypressed "space"
                 end
-            else
+            elseif not moan.showingOptions then
+                print "Locking parser..."
                 parser.lock()
-                scheduler.after(.75, parser.unlock)
-                if not moan.showingOptions then
-                    moan.speak("", {"Select Incoming Transmission:"}, {options=remainingTransmissions})
-                    moan.speak("", {""})
-                end
+
+                scheduler.after(.75, function() parser.unlock() print"Unlocking parser..." end)
+                print "Queueing dialogue options..."
+                moan.speak("", {"Select Incoming Transmission:"}, {options=remainingTransmissions})
+                moan.speak("", {""})
                 if not currentParser then
                     moan.keypressed "space"
                 end
+            else
+                moan.keypressed "space"
             end
         else
             moan.keypressed "space"
@@ -177,16 +206,20 @@ function advanceDialogue()
 end
 
 function love.keypressed(key, scancode, isrepeat)
+    if key == "escape" then
+        love.event.quit()
+    end
     if not atTitleScreen then
-        if key == "escape" then
-            love.event.quit()
-        end
         if not optionLocked then
             if key == "space" then
+                print"Advancing dialogue"
                 advanceDialogue()
             else
+                print "Running moan.keypressed"
                 moan.keypressed(key)
             end
+        else
+            print "Option locked"
         end
         local currentMenu = gui.currentMenu()
         if key == "p" and currentMenu ~= "main_menu" and currentMenu ~= "settings" then

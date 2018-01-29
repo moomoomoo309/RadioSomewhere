@@ -43,13 +43,11 @@ end
 
 function shine._apply_shader_to_scene(_, shader, canvas, func, ...)
     local s = love.graphics.getShader()
-    local co = { love.graphics.getColor() }
 
     -- draw scene to canvas
     shine._render_to_canvas(_, canvas, func, ...)
 
     -- apply shader to canvas
-    love.graphics.setColor(co)
     love.graphics.setShader(shader)
     local b = love.graphics.getBlendMode()
     love.graphics.setBlendMode('alpha', 'premultiplied')
