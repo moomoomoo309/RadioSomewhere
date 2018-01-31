@@ -10,8 +10,8 @@ local parser = {}
 --- Prompts the player for input between dialogue options.
 --- @tparam table tbl The script
 --- @tparam coroutine process The coroutine the parser is running from.
---- @treturn string The choice the player picked.
-local function promptPlayer(tbl, process)
+--- @treturn any,string The result of the player's choice, and the choice the player picked.
+function promptPlayer(tbl, process)
     local choices = {}
     local option
     for k, v in pairs(tbl) do
@@ -26,7 +26,7 @@ local function promptPlayer(tbl, process)
     end
     optionLocked = true
     scheduler.after(.75, function() optionLocked = false end, "pausable")
-    moan.speak("", { "" }, { options = choices })
+    moan.speak("", { promptTitle or "" }, { options = choices })
     repeat
         coroutine.yield() -- Until a choice is picked, don't go back to processVal.
     until option
@@ -125,6 +125,10 @@ function parser.processVal(tbl, process, noYield)
                 parser.processVal(val(val, tbl), process, noYield)
             end
         end
+    elseif type(tbl) == "function" then
+        parser.processVal(tbl(), process, noYield)
+    elseif type(tbl) == "string" then
+        parser.processLine(tbl, nil, noYield)
     end
 end
 
@@ -154,8 +158,12 @@ function parser.parse(path)
         error()
     end
     local processTbl = require(path)
-    if type(processTbl) == "table" then
-        return coroutine.create(parser.processVal), processTbl
+    return parser.parseTbl(processTbl)
+end
+
+function parser.parseTbl(tbl)
+    if type(tbl) == "table" then
+        return coroutine.create(parser.processVal), tbl
     else
         return false
     end

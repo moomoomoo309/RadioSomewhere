@@ -56,7 +56,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords){
     vec4 thisPx = Texel(texture, texture_coords);
-    if (thisPx[3] < 0.01) {
+    if (thisPx[3] < 0.15) {
         return thisPx;
     }
     vec2 fragCoord = texture_coords * iResolution.xy;

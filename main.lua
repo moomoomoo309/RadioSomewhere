@@ -44,6 +44,7 @@ local cancelMusicLoop
 local function init()
     gui.init()
     parseScript "assets.drinkingBuddyScript"
+    moan.speak("", { " I N C O M I N G  T R A N S M I S S I O N \n\n\n\n\t\t\t[SPACE TO CONTINUE]" })
     cancelMusicLoop = audioHandler.loop("Openeraudio", nil, 0)
 end
 
@@ -53,13 +54,31 @@ function love.load()
     init()
 end
 
+local function convertRemainingTransmissions(tbl)
+    local newTbl = {}
+    for k,v in pairs(tbl) do
+        newTbl[v[1]] = v[2]
+    end
+    return {newTbl}
+end
+
 function parseScript(path)
+    print(("Parsing script %s"):format(tostring(path)))
     if not path then
         currentParser, script = nil, nil
         face:setImagePath("assets/fuzz.png", true)
         moan.speak("", {""})
+        if #remainingTransmissions > 0 then
+            print "Setting up choices..."
+            promptTitle = "Choose Incoming Transmission:"
+            currentParser, script = parser.parseTbl(convertRemainingTransmissions(remainingTransmissions))
+        end
     end
-    currentParser, script = parser.parse(path)
+    if type(path) == "string" then
+        currentParser, script = parser.parse(path)
+    elseif type(path) == "table" then
+        currentParser, script = parser.parseTbl(path)
+    end
 end
 
 local picked = false
@@ -71,6 +90,8 @@ remainingTransmissions = {
         cancelMusicLoop()
         cancelMusicLoop = audioHandler.loop("Stardust Dreams")
         parseScript("assets.lostBoyScript")
+        moan.speak("", {""})
+        promptTitle = ""
         scheduler.after(.01, function() love.keypressed "space" end)
     end},
     {"Offer", function()
@@ -81,8 +102,9 @@ remainingTransmissions = {
             cancelMusicLoop()
             cancelMusicLoop = audioHandler.loop("consumartInSpace")
             parseScript("assets.offerScript")
+            moan.speak("", {""})
+            promptTitle = ""
             scheduler.after(.01, function() love.keypressed "space" end)
-
         end
     end},
     {"Questions", function()
@@ -91,6 +113,8 @@ remainingTransmissions = {
         cancelMusicLoop()
         cancelMusicLoop = audioHandler.loop("Space Debris")
         parseScript("assets.questionsScript")
+        moan.speak("", {""})
+        promptTitle = ""
         scheduler.after(.01, function() love.keypressed "space" end)
     end}
 }
@@ -151,7 +175,6 @@ local scanlineSpeed = 3
 function love.update(dt)
     if atTitleScreen and not gui.currentMenu() then
         atTitleScreen = false
-        moan.speak("", { " I N C O M I N G  T R A N S M I S S I O N \n\n\n\n\t\t\t[SPACE TO CONTINUE]" })
     end
     scheduler.update(dt)
     if gui.currentMenu() ~= "pause" then
@@ -173,6 +196,7 @@ function advanceDialogue()
                     face:setImagePath("assets/thomas.png", true)
                 end
                 firstRun = false
+                print "Resuming coroutine"
                 local success, msg = coroutine.resume(currentParser, script, currentParser)
                 if gameDebug and msg and #msg > 195 then
                     print("msg too long!", msg:sub(1, 195), "!", msg:sub(196))
@@ -183,17 +207,6 @@ function advanceDialogue()
                     moan.speak("", { msg })
                     moan.keypressed "space"
                 else
-                    moan.keypressed "space"
-                end
-            elseif not moan.showingOptions then
-                print "Locking parser..."
-                parser.lock()
-
-                scheduler.after(.75, function() parser.unlock() print"Unlocking parser..." end)
-                print "Queueing dialogue options..."
-                moan.speak("", {"Select Incoming Transmission:"}, {options=remainingTransmissions})
-                moan.speak("", {""})
-                if not currentParser then
                     moan.keypressed "space"
                 end
             else

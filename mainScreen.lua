@@ -42,7 +42,7 @@ local textboxCanvas = love.graphics.newCanvas(w, h)
 local crtFont = love.graphics.newFont("assets/VT323-Regular.ttf", 72*love.graphics.getHeight() / 720)
 
 local glowEffect = shine.glowsimple()
-glowEffect.min_luma = .3 * h / 1080
+glowEffect.min_luma = .3
 textScanlineEffect = shine.scanlines()
 textScanlineEffect.opacity = .5
 textScanlineEffect.line_height = .333333
@@ -59,7 +59,7 @@ local titleFont = crtFont
 local msgFont = crtFont
 local nextMsgSprite
 
-textShader = boxblur:chain(glowEffect):chain(textScanlineEffect):chain(static)
+textShader = boxblur:chain(glowEffect):chain(textScanlineEffect):chain(static)--:chain(glowEffect)
 
 imageScanlineEffect = shine.scanlines()
 imageScanlineEffect.opacity = .5
