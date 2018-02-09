@@ -1,3 +1,4 @@
+---[[
 return {
     "Skip!",
     function(val, tbl)
@@ -6,8 +7,9 @@ return {
         return "  T R A N S M I S S I O N        O V E R"
     end,
 }
+--]]
 --[[
-{
+return {
     "#thomas: Hey Carl, thank god man. Things have really gone to shit huh?",
     {
         ["#uwsss: I'm sorry this isn't Carl."] = {
@@ -75,4 +77,4 @@ return {
         },
     },
 }
-]]
+--]]

@@ -63,13 +63,10 @@ local function convertRemainingTransmissions(tbl)
 end
 
 function parseScript(path)
-    print(("Parsing script %s"):format(tostring(path)))
     if not path then
         currentParser, script = nil, nil
         face:setImagePath("assets/fuzz.png", true)
-        moan.speak("", {""})
         if #remainingTransmissions > 0 then
-            print "Setting up choices..."
             promptTitle = "Choose Incoming Transmission:"
             currentParser, script = parser.parseTbl(convertRemainingTransmissions(remainingTransmissions))
         end
@@ -85,7 +82,6 @@ local picked = false
 
 remainingTransmissions = {
     {"Lost Boy", function()
-        print "Lost boy picked!"
         face:setImagePath("assets/oldlady.png", true)
         cancelMusicLoop()
         cancelMusicLoop = audioHandler.loop("Stardust Dreams")
@@ -97,7 +93,6 @@ remainingTransmissions = {
     {"Offer", function()
         if not picked then
             picked = true
-            print "Offer picked!"
             face:setImagePath("assets/noface.png", true)
             cancelMusicLoop()
             cancelMusicLoop = audioHandler.loop("consumartInSpace")
@@ -108,7 +103,6 @@ remainingTransmissions = {
         end
     end},
     {"Questions", function()
-        print "Questions picked!"
         face:setImagePath("assets/girl.png", true)
         cancelMusicLoop()
         cancelMusicLoop = audioHandler.loop("Space Debris")
@@ -196,7 +190,6 @@ function advanceDialogue()
                     face:setImagePath("assets/thomas.png", true)
                 end
                 firstRun = false
-                print "Resuming coroutine"
                 local success, msg = coroutine.resume(currentParser, script, currentParser)
                 if gameDebug and msg and #msg > 195 then
                     print("msg too long!", msg:sub(1, 195), "!", msg:sub(196))
@@ -225,14 +218,10 @@ function love.keypressed(key, scancode, isrepeat)
     if not atTitleScreen then
         if not optionLocked then
             if key == "space" then
-                print"Advancing dialogue"
                 advanceDialogue()
             else
-                print "Running moan.keypressed"
                 moan.keypressed(key)
             end
-        else
-            print "Option locked"
         end
         local currentMenu = gui.currentMenu()
         if key == "p" and currentMenu ~= "main_menu" and currentMenu ~= "settings" then
