@@ -109,7 +109,7 @@ function template.substitute(str,env)
     local out = {}
     local res,err = xpcall(function() fn(function(s)
         out[#out+1] = s
-    end) end, gameDebug.traceback)
+    end) end, debug.traceback)
     if not res then
         if env._debug then print(code) end
         return nil,err

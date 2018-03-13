@@ -1,4 +1,8 @@
 --- offer
+local function endScript()
+    parseScript()
+end
+
 local mainScript = {
     "#bot3412: GREETINGS SIR/MADAM!",
     "#bot3412: ARE YOU EMBARRASSED BY YOUR LOOKS?",
@@ -23,12 +27,12 @@ local mainScript = {
                             "#bot3412: PROCESSING...",
                             "#bot3412: I'M SORRY.",
                             "#bot3412: PLEASE PROVIDE YOUR ADDRESS IN THE FORM OF: HOUSE/APARTMENT NUMBER, STREET NAME, STATE, ZIP CODE, COUNTRY.",
-                            ["Disconnect."] = parseScript
+                            ["Disconnect."] = endScript
                         },
-                        ["Disconnect."] = parseScript,
+                        ["Disconnect."] = endScript,
                     },
                 },
-                ["Disconnect."] = parseScript,
+                ["Disconnect."] = endScript,
             }
         }
     }

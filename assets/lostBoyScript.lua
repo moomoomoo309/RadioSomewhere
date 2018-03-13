@@ -9,15 +9,9 @@ local noJohn = {
         "#uwsss: I'm sorry",
         "#theresa: I'm sorry to have bothered you stranger.",
         "#theresa: I have to find my boy. Do take care.",
-        "T R A N S M I S S I O N        O V E R",
         function()
             parseScript()
-            for i = 1, #remainingTransmissions do
-                print(remainingTransmissions[i][1])
-                if remainingTransmissions[i][1] == "assets.lostBoyScript" then
-                    table.remove(remainingTransmissions, i)
-                end
-            end
+            return endStr
         end
     },
     ["#uwsss: I'm right here ma."] = {
@@ -30,25 +24,16 @@ local noJohn = {
         "#theresa: Be safe John. Dangerous world these days.",
         "#uwsss: Don't worry about me.",
         "#theresa: You'll always be my boy",
-        "T R A N S M I S S I O N        O V E R",
+
         function()
             parseScript()
-            for i = 1, #remainingTransmissions do
-                if remainingTransmissions[i][1] == "assets.lostBoyScript" then
-                    table.remove(remainingTransmissions, i)
-                end
-            end
+            return endStr
         end
     },
     ["E N D    T R A N S M I S S I O N"] = {
-        "T R A N S M I S S I O N        O V E R",
         function()
             parseScript()
-            for i = 1, #remainingTransmissions do
-                if remainingTransmissions[i][1] == "assets.lostBoyScript" then
-                    table.remove(remainingTransmissions, i)
-                end
-            end
+            return endStr
         end
     },
 }
@@ -81,11 +66,17 @@ goLeft = {
                     "#theresa: Be safe John. It's a dangerous world these days.",
                     "#uwsss: Don't worry about me.",
                     "#theresa: You'll always be my boy",
-                    "T R A N S M I S S I O N        O V E R",
+                    function()
+                        parseScript()
+                        return endStr
+                    end,
 
                 },
                 ["E N D    T R A N S M I S S I O N"] = {
-                    "T R A N S M I S S I O N        O V E R",
+                    function()
+                        parseScript()
+                        return endStr
+                    end,
                 },
             },
             ["#uwsss: The entrance to the living room is to your right"] = {
@@ -156,11 +147,7 @@ local mainScript = {
             "#theresa: I'm sorry John. I was lost in thought. What were we talking about?",
             function()
                 parseScript()
-                for i = 1, #remainingTransmissions do
-                    if remainingTransmissions[i][1] == "assets.lostBoyScript" then
-                        table.remove(remainingTransmissions, i)
-                    end
-                end
+                return endStr
             end
         },
     },
@@ -168,11 +155,7 @@ local mainScript = {
         "#theresa: I'm sorry John. I was lost in thought. What were we talking about?",
         function()
             parseScript()
-            for i = 1, #remainingTransmissions do
-                if remainingTransmissions[i][1] == "assets.lostBoyScript" then
-                    table.remove(remainingTransmissions, i)
-                end
-            end
+            return endStr
         end
     },
     ["#uwsss: Why was your transmission subject \"Lost my boy?\" "] = {

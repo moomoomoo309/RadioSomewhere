@@ -88,6 +88,9 @@ local prefixes = {
 --- @tparam boolean noYield Makes the coroutine not yield, so it processes another line.
 --- @return nil
 function parser.processLine(val, tbl, noYield)
+    if type(val) ~= "string" then
+        print(debug.traceback())
+    end
     assert(type(val) == "string", ("Expected string, got %s."):format(type(val)))
     local prefixed = false
     for k, v in pairs(prefixes) do
@@ -125,6 +128,10 @@ function parser.processVal(tbl, process, noYield)
                 parser.processVal(val(val, tbl), process, noYield)
             end
         end
+    elseif type(tbl) == "string" then
+        parser.processLine(tbl, nil, noYield)
+    elseif type(tbl) == "function" then
+        parser.processVal(tbl(tbl, nil), process, noYield)
     end
 end
 
@@ -151,7 +158,7 @@ end
 --- @treturn coroutine,table|false A coroutine to the parser and the table it's reading from, or false if it is unsuccessful.
 function parser.parse(path)
     if not path then
-        error()
+        error "Cannot parse a script without a path!"
     end
     local processTbl = require(path)
     if type(processTbl) == "table" then

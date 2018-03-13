@@ -1,4 +1,14 @@
 return {
+    "Skip!",
+    function()
+        parseScript()
+        return endStr
+    end,
+}
+
+--[[
+
+return {
     "#thomas: Hey Carl, thank god man. Things have really gone to shit huh?",
     {
         ["#uwsss: I'm sorry this isn't Carl."] = {
@@ -66,3 +76,4 @@ return {
         },
     },
 }
+--]]

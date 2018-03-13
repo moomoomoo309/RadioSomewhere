@@ -11,12 +11,11 @@ local shine = require "shine"
 
 local w, h = love.graphics.getDimensions()
 
-local gaussian = shine.gaussianblur()
-gaussian.sigma = 20
-
 optionLocked = false
 
 io.stdout:setvbuf "no"
+
+endStr = "  T R A N S M I S S I O N        O V E R"
 
 local currentParser, script
 local atTitleScreen = true
@@ -29,14 +28,14 @@ local titlecard = sprite {
 }
 
 local titlecardStatic = sprite {
-    x=0,
-    y=0,
-    w=w,
-    h=h,
+    x = w * 178 / 1920,
+    y = h * 241 / 1080,
+    w = w * 525 / 1920,
+    h = h * 441 / 1080,
     imagePath = "assets/titlecardstatic.png"
 }
-local titlecardStaticNoiseShader = shine.noise()
-scheduler.everyCondition(function() return titlecardStatic.visible end, function() titlecardStaticNoiseShader:set("iTime", love.timer.getTime()*1000) end)
+local titlecardStaticNoiseShader = shine.filmgrain()
+titlecardStaticNoiseShader.opacity = .5
 staticShader = titlecardStaticNoiseShader:chain(imageScanlineEffect)
 
 local cancelMusicLoop
@@ -53,47 +52,83 @@ function love.load()
     init()
 end
 
+local function queueDialogueOptions()
+    print "Queueing dialogue options..."
+
+    print(serpent.block(remainingTransmissions))
+    moan.speak("", { "Select Incoming Transmission:" }, { options = remainingTransmissions })
+    moan.speak("", { "" })
+
+    print "Locking parser..."
+    parser.lock()
+    scheduler.after(.75, function()
+        parser.unlock() print "Unlocking parser..."
+    end)
+end
+
+local currentScript
+
 function parseScript(path)
-    if not path then
+    if not path and currentScript then
         currentParser, script = nil, nil
+        print "Clearing script..."
         face:setImagePath("assets/fuzz.png", true)
-        moan.speak("", {""})
+        for i = 1,#remainingTransmissions do
+            if not remainingTransmissions[i] then
+                break
+            end
+            if remainingTransmissions[i][1]:find(currentScript, nil, true) then
+                table.remove(remainingTransmissions, i)
+            end
+        end
+        moan.speak("", { "" })
+        queueDialogueOptions()
+    elseif currentScript then
+        print "Parsing script..."
     end
-    currentParser, script = parser.parse(path)
+    if path then
+        currentParser, script = parser.parse(path)
+    end
 end
 
 local picked = false
 
 remainingTransmissions = {
-    {"Lost Boy", function()
+    { "Lost Boy", function()
+        currentScript = "Lost Boy"
         print "Lost boy picked!"
         face:setImagePath("assets/oldlady.png", true)
         cancelMusicLoop()
-        cancelMusicLoop = audioHandler.loop("Stardust Dreams")
-        parseScript("assets.lostBoyScript")
-        scheduler.after(.01, function() love.keypressed "space" end)
-    end},
-    {"Offer", function()
-        if not picked then
-            picked = true
-            print "Offer picked!"
-            face:setImagePath("assets/noface.png", true)
-            cancelMusicLoop()
-            cancelMusicLoop = audioHandler.loop("consumartInSpace")
-            parseScript("assets.offerScript")
-            scheduler.after(.01, function() love.keypressed "space" end)
-
-        end
-    end},
-    {"Questions", function()
+        cancelMusicLoop = audioHandler.loop "Stardust Dreams"
+        parseScript "assets.lostBoyScript"
+        scheduler.after(.01, function()
+            love.keypressed "space"
+        end)
+    end },
+    { "Offer", function()
+        currentScript = "Offer"
+        print "Offer picked!"
+        face:setImagePath("assets/noface.png", true)
+        cancelMusicLoop()
+        cancelMusicLoop = audioHandler.loop "consumartInSpace"
+        parseScript "assets.offerScript"
+        scheduler.after(.01, function()
+            love.keypressed "space"
+        end)
+    end },
+    { "Questions", function()
+        currentScript = "Questions"
         print "Questions picked!"
         face:setImagePath("assets/girl.png", true)
         cancelMusicLoop()
-        cancelMusicLoop = audioHandler.loop("Space Debris")
-        parseScript("assets.questionsScript")
-        scheduler.after(.01, function() love.keypressed "space" end)
-    end}
+        cancelMusicLoop = audioHandler.loop "Space Debris"
+        parseScript "assets.questionsScript"
+        scheduler.after(.01, function()
+            love.keypressed "space"
+        end)
+    end }
 }
+local firstScript = true
 
 
 local function drawGame()
@@ -105,11 +140,9 @@ local function drawGame()
     else
         if gui.currentMenu() == "main_menu" then
             titlecard:draw()
-            local oldColor = {love.graphics.getColor()}
-            love.graphics.setColor(oldColor[1], oldColor[2], oldColor[3], 128)
-            titlecardStatic:draw()
-            staticShader:draw(function() titlecardStatic:draw() end)
-            love.graphics.setColor(oldColor)
+            staticShader:draw(function()
+                titlecardStatic:draw()
+            end)
             textShader:draw(function()
                 gooi.draw "main_menu"
                 love.graphics.push()
@@ -134,24 +167,26 @@ local function drawGame()
         end)
     end
     if not gui.currentMenu() then
-        gaussian:draw(function()
+        if databaseBtn.visible then
             gooi.draw "database"
-        end)
+        end
         gooi.draw "main_game"
-
     end
 end
 
+serpent = require "serpent"
+
 function love.draw()
     drawGame()
+    love.graphics.print("Current FPS: " .. tostring(love.timer.getFPS()), 10, 10)
 end
 
-local scanlineSpeed = 3
+local scanlineSpeed = 5
 
 function love.update(dt)
     if atTitleScreen and not gui.currentMenu() then
         atTitleScreen = false
-        moan.speak("", { " I N C O M I N G  T R A N S M I S S I O N \n\n\n\n\t\t\t[SPACE TO CONTINUE]" })
+        moan.speak("", { "\t\t\tI N C O M I N G\t\tT R A N S M I S S I O N\n\n\n\n\t\t\t\t\t\t[SPACE TO CONTINUE]" })
     end
     scheduler.update(dt)
     if gui.currentMenu() ~= "pause" then
@@ -185,16 +220,8 @@ function advanceDialogue()
                 else
                     moan.keypressed "space"
                 end
-            elseif not moan.showingOptions then
-                print "Locking parser..."
-                parser.lock()
-
-                scheduler.after(.75, function() parser.unlock() print"Unlocking parser..." end)
-                print "Queueing dialogue options..."
-                moan.speak("", {"Select Incoming Transmission:"}, {options=remainingTransmissions})
-                moan.speak("", {""})
-                if not currentParser then
-                    moan.keypressed "space"
+                if currentParser and coroutine.status(currentParser) == "dead" then
+                    queueDialogueOptions()
                 end
             else
                 moan.keypressed "space"
@@ -212,7 +239,7 @@ function love.keypressed(key, scancode, isrepeat)
     if not atTitleScreen then
         if not optionLocked then
             if key == "space" then
-                print"Advancing dialogue"
+                print "Advancing dialogue"
                 advanceDialogue()
             else
                 print "Running moan.keypressed"

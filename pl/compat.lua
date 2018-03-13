@@ -81,28 +81,28 @@ else
     -- in the case of a function with no globals:
     -- http://lua-users.org/lists/lua-l/2010-06/msg00315.html
     function compat.setfenv(f, t)
-        f = (type(f) == 'function' and f or gameDebug.getinfo(f + 1, 'f').func)
+        f = (type(f) == 'function' and f or debug.getinfo(f + 1, 'f').func)
         local name
         local up = 0
         repeat
             up = up + 1
-            name = gameDebug.getupvalue(f, up)
+            name = debug.getupvalue(f, up)
         until name == '_ENV' or name == nil
         if name then
-            gameDebug.upvaluejoin(f, up, function() return name end, 1) -- use unique upvalue
-            gameDebug.setupvalue(f, up, t)
+            debug.upvaluejoin(f, up, function() return name end, 1) -- use unique upvalue
+            debug.setupvalue(f, up, t)
         end
         if f ~= 0 then return f end
     end
 
     function compat.getfenv(f)
         local f = f or 0
-        f = (type(f) == 'function' and f or gameDebug.getinfo(f + 1, 'f').func)
+        f = (type(f) == 'function' and f or debug.getinfo(f + 1, 'f').func)
         local name, val
         local up = 0
         repeat
             up = up + 1
-            name, val = gameDebug.getupvalue(f, up)
+            name, val = debug.getupvalue(f, up)
         until name == '_ENV' or name == nil
         return val
     end

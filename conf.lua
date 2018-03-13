@@ -17,4 +17,5 @@ function love.conf(t)
     t.window.width = w
     t.window.height = h
     t.version = "0.10.2"
+    t.vsync = false
 end

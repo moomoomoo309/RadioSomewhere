@@ -16,7 +16,6 @@ local contactsPanel
 local contactsTable = {}
 local pauseLabel
 local startBtn
-local databaseBtn
 local fontColor = { 255, 255, 255 }
 
 gameDebug = false
@@ -381,9 +380,11 @@ local function init()
     end)
 
     databaseBtn.events.hover = function(self)
+        self.visible = true
         self.style.bgColor = { 180, 0, 255 }
     end
     databaseBtn.events.unhover = function(self)
+        self.visible = false
         self.style.bgColor = component.colors.blue
     end
 
