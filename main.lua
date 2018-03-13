@@ -9,6 +9,8 @@ local scheduler = require "scheduler"
 local sprite = require "sprite"
 local shine = require "shine"
 
+serpent = require "serpent"
+
 local w, h = love.graphics.getDimensions()
 
 optionLocked = false
@@ -43,6 +45,7 @@ local cancelMusicLoop
 local function init()
     gui.init()
     parseScript "assets.drinkingBuddyScript"
+    moan.speak("", { " I N C O M I N G  T R A N S M I S S I O N \n\n\n\n\t\t\t[SPACE TO CONTINUE]" })
     cancelMusicLoop = audioHandler.loop("Openeraudio", nil, 0)
 end
 
@@ -50,6 +53,14 @@ function love.load()
     parser.unlock()
     scheduler.resume "default"
     init()
+end
+
+local function convertRemainingTransmissions(tbl)
+    local newTbl = {}
+    for k,v in pairs(tbl) do
+        newTbl[v[1]] = v[2]
+    end
+    return {newTbl}
 end
 
 local function queueDialogueOptions()
@@ -73,6 +84,10 @@ function parseScript(path)
         currentParser, script = nil, nil
         print "Clearing script..."
         face:setImagePath("assets/fuzz.png", true)
+        if #remainingTransmissions > 0 then
+            promptTitle = "Choose Incoming Transmission:"
+            currentParser, script = parser.parseTbl(convertRemainingTransmissions(remainingTransmissions))
+        end
         for i = 1,#remainingTransmissions do
             if not remainingTransmissions[i] then
                 break
@@ -86,8 +101,10 @@ function parseScript(path)
     elseif currentScript then
         print "Parsing script..."
     end
-    if path then
+    if type(path) == "string" then
         currentParser, script = parser.parse(path)
+    elseif type(path) == "table" then
+        currentParser, script = parser.parseTbl(path)
     end
 end
 
@@ -99,12 +116,11 @@ remainingTransmissions = {
         print "Lost boy picked!"
         face:setImagePath("assets/oldlady.png", true)
         cancelMusicLoop()
-        cancelMusicLoop = audioHandler.loop "Stardust Dreams"
-        parseScript "assets.lostBoyScript"
-        scheduler.after(.01, function()
-            love.keypressed "space"
-        end)
-    end },
+        cancelMusicLoop = audioHandler.loop("Stardust Dreams")
+        parseScript("assets.lostBoyScript")
+        promptTitle = ""
+        scheduler.after(.01, function() love.keypressed "space" end)
+    end},
     { "Offer", function()
         currentScript = "Offer"
         print "Offer picked!"
@@ -123,6 +139,7 @@ remainingTransmissions = {
         cancelMusicLoop()
         cancelMusicLoop = audioHandler.loop "Space Debris"
         parseScript "assets.questionsScript"
+        promptTitle = ""
         scheduler.after(.01, function()
             love.keypressed "space"
         end)
@@ -174,8 +191,6 @@ local function drawGame()
     end
 end
 
-serpent = require "serpent"
-
 function love.draw()
     drawGame()
     love.graphics.print("Current FPS: " .. tostring(love.timer.getFPS()), 10, 10)
@@ -186,7 +201,6 @@ local scanlineSpeed = 5
 function love.update(dt)
     if atTitleScreen and not gui.currentMenu() then
         atTitleScreen = false
-        moan.speak("", { "\t\t\tI N C O M I N G\t\tT R A N S M I S S I O N\n\n\n\n\t\t\t\t\t\t[SPACE TO CONTINUE]" })
     end
     scheduler.update(dt)
     if gui.currentMenu() ~= "pause" then

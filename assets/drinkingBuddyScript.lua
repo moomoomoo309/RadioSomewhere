@@ -1,3 +1,14 @@
+---[[
+return {
+    "Skip!",
+    function(val, tbl)
+        --TODO: Add carl's letter to the database
+        parseScript()
+        return "  T R A N S M I S S I O N        O V E R"
+    end,
+}
+--]]
+--[[
 return {
     "Skip!",
     function()
