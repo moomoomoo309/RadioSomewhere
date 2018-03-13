@@ -20,11 +20,11 @@ local mainScript = {
             "#nonna_miss: I'm sorry I bothered you.",
             "#nonna_miss: Good-bye.",
             {
-                ["#uwss: Good-bye."] = {
+                ["#uwsss: Good-bye."] = {
                     "#nonna_miss: Thanks again for your time.",
                     finish
                 },
-                ["#uwss: I don't think your questions are stupid."] = {
+                ["#uwsss: I don't think your questions are stupid."] = {
                     "#nonna_miss: That's really nice of you to say, but it's okay. I'm just sort of asking myself things to pass time. I don't have much else to do.",
                     "#nonna_miss: Lately, I've been thinking about noises. Like silly, goofy noises I can use to seriously express myself -- even though they sound ridiculous.",
                 },

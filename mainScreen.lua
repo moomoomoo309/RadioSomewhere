@@ -139,7 +139,7 @@ end
 
 local moanDraw = function()
     drawMoan(nil, msgFont, { x = w * 235 / 960, y = h * 377 / 540, w = w * .54, h = h * .16 },
-    { x = 0, y = 0 }, nextMsgSprite)
+    { x = w * 235 / 960, y = h * 377 / 540 }, nextMsgSprite, 68)
 end
 
 local function draw()

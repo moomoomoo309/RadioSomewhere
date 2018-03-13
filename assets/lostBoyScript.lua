@@ -143,7 +143,7 @@ local mainScript = {
                 }
             }
         },
-        ["#uwss: I'm sorry, but I should probably see if I can help someone else who's transmitting"] = {
+        ["#uwsss: I'm sorry, but I should probably see if I can help someone else who's transmitting"] = {
             "#theresa: I'm sorry John. I was lost in thought. What were we talking about?",
             function()
                 parseScript()

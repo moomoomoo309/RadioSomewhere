@@ -25,7 +25,9 @@ local function promptPlayer(tbl, process)
         end
     end
     optionLocked = true
-    scheduler.after(.75, function() optionLocked = false end, "pausable")
+    scheduler.after(.75, function()
+        optionLocked = false
+    end, "pausable")
     moan.speak("", { "" }, { options = choices })
     repeat
         coroutine.yield() -- Until a choice is picked, don't go back to processVal.
@@ -88,9 +90,6 @@ local prefixes = {
 --- @tparam boolean noYield Makes the coroutine not yield, so it processes another line.
 --- @return nil
 function parser.processLine(val, tbl, noYield)
-    if type(val) ~= "string" then
-        print(debug.traceback())
-    end
     assert(type(val) == "string", ("Expected string, got %s."):format(type(val)))
     local prefixed = false
     for k, v in pairs(prefixes) do
@@ -114,23 +113,24 @@ end
 --- @tparam boolean noYield Makes the coroutine not yield, so it processes another line.
 --- @return nil
 function parser.processVal(tbl, process, noYield)
-    if type(tbl) == "table" then
+    local t = type(tbl)
+    if t == "table" then
         tbl.vars = tbl.vars or {}
         for i = 1, #tbl do
             local val = tbl[i]
-            local t = type(val)
-            if t == "string" then
-                parser.processLine(val, tbl, noYield)
-            elseif t == "table" then
+            t = type(val)
+            if t == "table" then
                 local option, text = promptPlayer(val, process)
                 parser.processVal(option, process, noYield)
+            elseif t == "string" then
+                parser.processLine(val, tbl, noYield)
             elseif t == "function" then
                 parser.processVal(val(val, tbl), process, noYield)
             end
         end
-    elseif type(tbl) == "string" then
+    elseif t == "string" then
         parser.processLine(tbl, nil, noYield)
-    elseif type(tbl) == "function" then
+    elseif t == "function" then
         parser.processVal(tbl(tbl, nil), process, noYield)
     end
 end
@@ -161,8 +161,12 @@ function parser.parse(path)
         error "Cannot parse a script without a path!"
     end
     local processTbl = require(path)
-    if type(processTbl) == "table" then
-        return coroutine.create(parser.processVal), processTbl
+    return unpack{parser.parseTbl(processTbl)}
+end
+
+function parser.parseTbl(tbl)
+    if type(tbl) == "table" then
+        return coroutine.create(parser.processVal), tbl
     else
         return false
     end

@@ -17,7 +17,7 @@ optionLocked = false
 
 io.stdout:setvbuf "no"
 
-endStr = "  T R A N S M I S S I O N        O V E R"
+endStr = "\t\t\t\tT R A N S M I S S I O N\tO V E R"
 
 local currentParser, script
 local atTitleScreen = true
@@ -45,7 +45,7 @@ local cancelMusicLoop
 local function init()
     gui.init()
     parseScript "assets.drinkingBuddyScript"
-    moan.speak("", { " I N C O M I N G  T R A N S M I S S I O N \n\n\n\n\t\t\t[SPACE TO CONTINUE]" })
+    moan.speak("", { "\t\t\tI N C O M I N G\t\tT R A N S M I S S I O N \n\n\n\n\t\t\t\t\t\t[SPACE TO CONTINUE]" })
     cancelMusicLoop = audioHandler.loop("Openeraudio", nil, 0)
 end
 
@@ -53,14 +53,6 @@ function love.load()
     parser.unlock()
     scheduler.resume "default"
     init()
-end
-
-local function convertRemainingTransmissions(tbl)
-    local newTbl = {}
-    for k,v in pairs(tbl) do
-        newTbl[v[1]] = v[2]
-    end
-    return {newTbl}
 end
 
 local function queueDialogueOptions()
@@ -84,11 +76,7 @@ function parseScript(path)
         currentParser, script = nil, nil
         print "Clearing script..."
         face:setImagePath("assets/fuzz.png", true)
-        if #remainingTransmissions > 0 then
-            promptTitle = "Choose Incoming Transmission:"
-            currentParser, script = parser.parseTbl(convertRemainingTransmissions(remainingTransmissions))
-        end
-        for i = 1,#remainingTransmissions do
+        for i = 1, #remainingTransmissions do
             if not remainingTransmissions[i] then
                 break
             end
@@ -100,6 +88,8 @@ function parseScript(path)
         queueDialogueOptions()
     elseif currentScript then
         print "Parsing script..."
+    else
+        print "Initializing first script..."
     end
     if type(path) == "string" then
         currentParser, script = parser.parse(path)
@@ -116,11 +106,12 @@ remainingTransmissions = {
         print "Lost boy picked!"
         face:setImagePath("assets/oldlady.png", true)
         cancelMusicLoop()
-        cancelMusicLoop = audioHandler.loop("Stardust Dreams")
-        parseScript("assets.lostBoyScript")
-        promptTitle = ""
-        scheduler.after(.01, function() love.keypressed "space" end)
-    end},
+        cancelMusicLoop = audioHandler.loop "Stardust Dreams"
+        parseScript "assets.lostBoyScript"
+        scheduler.after(.01, function()
+            love.keypressed "space"
+        end)
+    end },
     { "Offer", function()
         currentScript = "Offer"
         print "Offer picked!"
@@ -139,7 +130,6 @@ remainingTransmissions = {
         cancelMusicLoop()
         cancelMusicLoop = audioHandler.loop "Space Debris"
         parseScript "assets.questionsScript"
-        promptTitle = ""
         scheduler.after(.01, function()
             love.keypressed "space"
         end)
@@ -215,13 +205,15 @@ local firstRun = true
 function advanceDialogue()
     if not parser.locked() then
         if not moan.typing then
+            print "Advancing dialogue"
             if currentParser and coroutine.status(currentParser) ~= "dead" then
                 if firstRun then
                     cancelMusicLoop()
                     cancelMusicLoop = audioHandler.loop "Mountain Goats Tallahassee instrumental cover"
                     face:setImagePath("assets/thomas.png", true)
+                    firstRun = false
                 end
-                firstRun = false
+                print "Resuming coroutine..."
                 local success, msg = coroutine.resume(currentParser, script, currentParser)
                 if gameDebug and msg and #msg > 195 then
                     print("msg too long!", msg:sub(1, 195), "!", msg:sub(196))
@@ -230,14 +222,18 @@ function advanceDialogue()
                     print("Error!", success, msg)
                 elseif msg then
                     moan.speak("", { msg })
-                    moan.keypressed "space"
+                    print("msg="..msg)
+                      moan.keypressed "space"
                 else
                     moan.keypressed "space"
                 end
                 if currentParser and coroutine.status(currentParser) == "dead" then
+                    print "Queueing dialogue options..."
                     queueDialogueOptions()
                 end
             else
+                print("opts")
+                print(serpent.block(moan.allMsgs[moan.currentMsgInstance]))
                 moan.keypressed "space"
             end
         else
@@ -253,7 +249,6 @@ function love.keypressed(key, scancode, isrepeat)
     if not atTitleScreen then
         if not optionLocked then
             if key == "space" then
-                print "Advancing dialogue"
                 advanceDialogue()
             else
                 print "Running moan.keypressed"
