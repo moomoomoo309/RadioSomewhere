@@ -16,7 +16,7 @@ local contactsPanel
 local contactsTable = {}
 local pauseLabel
 local startBtn
-local fontColor = { 255, 255, 255 }
+local fontColor = { 1, 1, 1 }
 
 gameDebug = false
 local paused = false
@@ -148,8 +148,7 @@ local function init()
         y = menuButton_yLocation + (menuButton_xIncrement * 2),
         w = menuButtonWidth,
         h = menuButtonHeight,
-        group = "main_menu",
-    --icon = "imgs/exit.png"
+        group = "main_menu"
     })                  :onRelease(function(self)
         if self.visible then
             exitOpen = true
@@ -178,7 +177,7 @@ local function init()
         w = width / 10,
         h = height / 10,
         group = "main_menu_title",
-    })                        :setStyle({ fgColor = { 255, 110, 255 }, font = love.graphics.newFont("assets/VT323-Regular.ttf", 100 * height / 720) })
+    })                        :setStyle({ fgColor = { 1, 110 / 255, 1 }, font = love.graphics.newFont("assets/VT323-Regular.ttf", 100 * height / 720) })
 
     --[[----------------------------------
     -------Settings Panel Generator-------
@@ -380,7 +379,7 @@ local function init()
 
     databaseBtn.events.hover = function(self)
         self.visible = true
-        self.style.bgColor = { 180, 0, 255 }
+        self.style.bgColor = { 180 / 255, 0, 1 }
     end
     databaseBtn.events.unhover = function(self)
         self.visible = false
@@ -429,55 +428,55 @@ local function init()
     savedFilesPanel:setColspan(1, 1, 3)
     savedFilesPanel:add(
             gooi.newLabel({ text = "Saved Files", group = "main_game" }):center(),
-            gooi.newButton({
+            gooi                      .newButton({
                 text = "1",
                 group = "main_game" }):onRelease(function(self)
                 displayFile()
 
             end),
-            gooi.newButton({
+            gooi                      .newButton({
                 text = "2",
                 group = "main_game" }):onRelease(function(self)
                 displayFile()
 
             end),
-            gooi.newButton({
+            gooi                      .newButton({
                 text = "3",
                 group = "main_game" }):onRelease(function(self)
                 displayFile()
 
             end),
-            gooi.newButton({
+            gooi                      .newButton({
                 text = "4",
                 group = "main_game" }):onRelease(function(self)
                 displayFile()
 
             end),
-            gooi.newButton({
+            gooi                      .newButton({
                 text = "5",
                 group = "main_game" }):onRelease(function(self)
                 displayFile("hello")
 
             end),
-            gooi.newButton({
+            gooi                      .newButton({
                 text = "6",
                 group = "main_game" }):onRelease(function(self)
                 displayFile()
 
             end),
-            gooi.newButton({
+            gooi                      .newButton({
                 text = "7",
                 group = "main_game" }):onRelease(function(self)
                 displayFile()
 
             end),
-            gooi.newButton({
+            gooi                      .newButton({
                 text = "8",
                 group = "main_game" }):onRelease(function(self)
                 displayFile()
 
             end),
-            gooi.newButton({
+            gooi                      .newButton({
                 text = "9",
                 group = "main_game" }):onRelease(function(self)
                 displayFile()

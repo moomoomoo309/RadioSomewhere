@@ -17,7 +17,7 @@ gooi.unit = love.window.toPixels(25)
 gooi.bs = "backspace"
 gooi.del = "delete"
 gooi.r = "right"
-gooi.l = "left"
+gooi.l = "left"          
 gooi.delayKey = 0.05
 gooi.delayCursorBlink = 0.4
 gooi.delayCanRepeat = 0.45
@@ -125,9 +125,9 @@ function gooi.newLabel(params)
         end
         if self.icon then
             local xImg = math.floor(self.x + self.h / 2)
-            love.graphics.setColor(255, 255, 255)
+            love.graphics.setColor(1, 1, 1)
             if not self.enabled then
-                love.graphics.setColor(63, 63, 63)
+                love.graphics.setColor(63 / 255, 63 / 255, 63 / 255)
             end
 
             if t:len() == 0 then
@@ -261,9 +261,9 @@ function gooi.newButton(params)
             if t:len() == 0 then
                 xImg = math.floor(self.x + self.w / 2)
             end
-            love.graphics.setColor(255, 255, 255)
+            love.graphics.setColor(1, 1, 1)
             if not self.enabled then
-                love.graphics.setColor(63, 63, 63)
+                love.graphics.setColor(63/255, 63/255, 63/255)
             end
             love.graphics.draw(self.icon, xImg, math.floor(self.y + self.h / 2), 0, 1, 1,
                     math.floor(self.icon:getWidth() / 2),
@@ -933,7 +933,7 @@ function gooi.newBar(params)
 
         love.graphics.setColor(self.style.fgColor)
         if not self.enabled then
-            love.graphics.setColor(63, 63, 63)
+            love.graphics.setColor(63 / 255, 63 / 255, 63 / 255)
         end
 
         local barWidth = self.value * (self.w - marginBars * 2)
@@ -1211,7 +1211,7 @@ function gooi.newJoy(params)
     function s:drawStick()
         local fg = self.style.fgColor
         if self.image then
-            love.graphics.setColor(255, 255, 255, fg[4] or 255)
+            love.graphics.setColor(1, 1, 1, fg[4] or 1)
             local sx = self.rStick * 2 / self.image:getWidth()
             local sy = self.rStick * 2 / self.image:getHeight()
             local x, y = self.xStick, self.yStick
@@ -1421,7 +1421,7 @@ function gooi.newKnob(params)
 
         love.graphics.setColor(fg)
         if not self.enabled then
-            love.graphics.setColor(63, 63, 63)
+            love.graphics.setColor(63 / 255, 63 / 255, 63 / 255)
         end
         love.graphics.arc("line",
                 "open",
@@ -1534,7 +1534,7 @@ function gooi.newPanel(params)
     end
     function p:drawSpecifics(fg)
         if self.layout.kind == "grid" then
-            love.graphics.setColor(0, 0, 0, 127)
+            love.graphics.setColor(0, 0, 0, .5)
             self.layout:drawCells()
         end
     end
@@ -2019,7 +2019,7 @@ function gooi.draw(group)
 
     local compWithTooltip = nil -- Just for desktop.
 
-    love.graphics.setColor(255, 255, 255)
+    love.graphics.setColor(1, 1, 1)
     love.graphics.setLineWidth(gooi.unit / 10)
     love.graphics.setLineStyle("smooth")
 
@@ -2087,7 +2087,7 @@ function gooi.draw(group)
         local ttf = compWithTooltip.style.tooltipFont
 
         local unit = compWithTooltip.style.tooltipFont:getHeight() / 5
-        love.graphics.setColor(0, 0, 0, 180)
+        love.graphics.setColor(0, 0, 0, 180 / 255)
         love.graphics.setFont(ttf)
         local xRect = love.mouse.getX() + disp - unit
         local yRect = love.mouse.getY() - disp * 2 - unit
@@ -2104,7 +2104,7 @@ function gooi.draw(group)
             yText = yText + hRect * 2
         end
         love.graphics.rectangle("fill", xRect, yRect, wRect, hRect)
-        love.graphics.setColor(255, 255, 255)
+        love.graphics.setColor(1, 1, 1)
         love.graphics.print(compWithTooltip.tooltip, math.floor(xText), math.floor(yText))
     end
 
@@ -2112,7 +2112,7 @@ function gooi.draw(group)
         love.graphics.setFont(gooi.getFont(self))-- Specific or a common font.
         local w, h = love.graphics.getWidth(), love.graphics.getHeight()
 
-        love.graphics.setColor(0, 0, 0, 127)
+        love.graphics.setColor(0, 0, 0, .5)
         love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 
         love.graphics.setColor(component.style.bgColor)

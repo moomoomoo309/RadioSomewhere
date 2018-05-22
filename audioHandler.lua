@@ -117,7 +117,7 @@ function audioHandler.loop(fileName, callback, startTime)
         error(("No audio file with filename %s found."):format(fileName))
     end
     local cancelFct = scheduler.everyCondition(function()
-        return audioObj:isStopped()
+        return not audioObj:isPlaying()
     end, function()
         play(audioObj)
     end, function()

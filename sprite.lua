@@ -287,7 +287,7 @@ end
 --- @return nil
 function sprite:setImagePath(imagePath, override)
     assert(type(imagePath) == "string", ("String expected, got %s."):format(type(imagePath)))
-    if not love.filesystem.exists(imagePath) then
+    if not love.filesystem.getInfo(imagePath) then
         return
     end
     assert(type(self) == "table" and self:extends "sprite", ("Sprite expected, got %s."):format(type(self) == "table" and self.type or type(self)))
@@ -322,7 +322,7 @@ function sprite:setImagePath(imagePath, override)
     self.image = not override and self.image or spriteSheet --If it was user-overridden, keep it!
     local success, metaFile = false, nil
     if self.animPath then
-        if love.filesystem.exists(self.animPath) then
+        if love.filesystem.getInfo(self.animPath) then
             success, metaFile = pcall(function()
                 return dofile(self.animPath)
             end) --Try to read the file...

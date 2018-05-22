@@ -111,7 +111,7 @@ function Moan.speak(title, messages, config)
         titleColor = title[2]
         title = title[1]
     else -- just a string
-        titleColor = { 255, 255, 255 }
+        titleColor = { 1, 1, 1 }
     end
 
     -- Config checking / defaulting

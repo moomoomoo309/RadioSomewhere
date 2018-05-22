@@ -1,12 +1,12 @@
 local sprite = require "sprite"
-local shine = require "shine"
+local moonshine = require "moonshine"
 local moan = require "Moan"
 local scheduler = require "scheduler"
 require "gooi"
 
 local w, h = love.graphics.getDimensions()
 
-local textColor = { 74, 215, 255 }
+local textColor = { 74 / 255, 215 / 255, 1 }
 
 local console = sprite {
     x = 0,
@@ -42,40 +42,38 @@ local textboxCanvas = love.graphics.newCanvas(w, h)
 
 local crtFont = love.graphics.newFont("assets/VT323-Regular.ttf", 24 * love.graphics.getHeight() / 720)
 
-local glowEffect = shine.glowsimple()
-glowEffect.min_luma = .3
-textScanlineEffect = shine.scanlines()
-textScanlineEffect.opacity = .5
-textScanlineEffect.line_height = .15
-textScanlineEffect.pixel_size = 9 * h ^ 2 / 1080 ^ 2
-textScanlineEffect.center_fade = 0
-local boxblur = shine.boxblur()
-boxblur.radius_h = 2 * h / 1080
-boxblur.radius_v = 2 * h / 1080
-local static = shine.filmgrain()
-static.opacity = .2
-static.grainsize = 2 * h / 1080
-
 local titleFont = crtFont
 local msgFont = crtFont
 local nextMsgSprite
 
-textShader = boxblur:chain(glowEffect):chain(textScanlineEffect):chain(static)
+--textShader = boxblur.chain(glowEffect).chain(textScanlineEffect).chain(static)
+textShader = moonshine(moonshine.effects.boxblur)
+                .chain(moonshine.effects.glow)
+                .chain(moonshine.effects.scanlines)
+                .chain(moonshine.effects.filmgrain)
+textShader.glow.min_luma = .65
+textShader.glow.strength = 2
+textShader.thickness = .15
+textShader.radius = 1 * h / 1080
+textShader.boxblur.radius = 1 * h / 1080
+textShader.opacity = .15
+textShader.size = 2 * h / 1080
 
-imageScanlineEffect = shine.scanlines()
-imageScanlineEffect.opacity = .5
-imageScanlineEffect.line_height = .15
-imageScanlineEffect.pixel_size = math.ceil(1440 / h ^ .9)
+local faceBlurEffect = moonshine(moonshine.effects.boxblur)
+faceBlurEffect.radius = h / 720
 
-local faceBlurEffect = shine.boxblur()
-faceBlurEffect.radius_h = h / 720
-faceBlurEffect.radius_v = h / 720
-
-local faceStatic = shine.filmgrain()
+local faceStatic = moonshine(moonshine.effects.filmgrain)
 faceStatic.opacity = .15
-faceStatic.grainsize = h / 720
+faceStatic.size = h / 720
 
-imageShader = faceBlurEffect:chain(faceStatic):chain(imageScanlineEffect)
+imageShader = moonshine(moonshine.effects.boxblur)
+        .chain(moonshine.effects.filmgrain)
+        .chain(moonshine.effects.scanlines)
+imageShader.thickness = .15
+imageShader.boxblur.radius = h / 720
+imageShader.opacity = .15
+imageShader.size = h / 720
+
 
 local marqueeOffset = 0
 local cancelMarquee
@@ -144,9 +142,11 @@ end
 
 local function draw()
     console:draw()
-    textShader:draw(moanDraw)
+    offsetY = offsetY + scanlineSpeed
+    textShader.scanlines.setters.offsetY(offsetY)
+    textShader.draw(moanDraw)
     face:draw()
-    staticShader:draw(function()
+    staticShader.draw(function()
         face:draw()
     end)
     crt:draw()

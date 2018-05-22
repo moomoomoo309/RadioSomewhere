@@ -2,17 +2,17 @@ component = {}
 component.__index = component
 component.colors = {
 
-    blue = {2, 117, 216, 0},
-    green = {92, 184, 92, 255},
-    cyan = {91, 192, 222, 255},
-    orange = {240, 173, 78, 255},
-    red = {217, 83, 79, 255},
-    black = {0, 0, 0, 255},
-    white = {255, 255, 255, 255},
-    clearGray = {247, 247, 247, 255},
-    darkGray = {41, 43, 44, 255},
-    darkGrayAlpha = {41, 43, 44, 150},
-    purple = {211, 129, 213, 255}
+    blue = {2 / 255, 117 / 255, 216 / 255, 0},
+    green = {92 / 255, 184 / 255, 92 / 255, 1},
+    cyan = {91 / 255, 192 / 255, 222 / 255, 1},
+    orange = {240 / 255, 173 / 255, 78 / 255, 1},
+    red = {217 / 255, 83 / 255, 79 / 255, 1},
+    black = {0, 0, 0, 1},
+    white = {1, 1, 1, 1},
+    clearGray = {247 / 255, 247 / 255, 247 / 255, 1},
+    darkGray = {41 / 255, 43 / 255, 44 / 255, 1},
+    darkGrayAlpha = {41 / 255, 43 / 255, 44 / 255, 150 / 255},
+    purple = {211 / 255, 129 / 255, 213 / 255, 1}
 }
 component.style = {
     bgColor = component.colors.blue,
@@ -83,7 +83,7 @@ function component.new(t, x, y, w, h, group)
 			color = gooi.toRGBA(color)
 		end
 		self.style.bgColor = color
-		self.style.borderColor = {color[1], color[2], color[3], 255}
+		self.style.borderColor = {color[1], color[2], color[3], 1}
 		self:make3d()
 		return self
 	end
@@ -111,7 +111,7 @@ function component.new(t, x, y, w, h, group)
 		if not w then return self.style.borderWidth, self.style.borderColor; end
 
 		self.style.borderWidth = w
-		self.style.borderColor = color or {12, 183, 242, 255}
+		self.style.borderColor = color or {12 / 255, 183 / 255, 242 / 255, 1}
 		if type(color) == "string" then
 			self.style.borderColor = gooi.toRGBA(color)
 			self.style.borderColor[4] = 255
@@ -128,7 +128,7 @@ function component.new(t, x, y, w, h, group)
 		self.mode3d = false
 		return self
 	end
-	
+
 	c.style = gooi.deepcopy(component.style)
 
 	function c:make3d()
@@ -169,7 +169,7 @@ function component.new(t, x, y, w, h, group)
         self.imgDataShadow:setPixel(0, 0, 0, 0, 0, 80)
         self.imgDataShadow:setPixel(0, 1, 0, 0, 0, 30)
         self.imgDataShadow:setPixel(0, 2, 0, 0, 0, 5)
-        
+
         self.imgShadow = love.graphics.newImage(self.imgDataShadow)
         self.imgShadow:setFilter("linear", "linear")
     end
@@ -212,7 +212,7 @@ function component.new(t, x, y, w, h, group)
     end
 
 	c:make3d()
-	
+
 	return setmetatable(c, component)
 end
 
@@ -245,12 +245,12 @@ function component:draw()-- Every component has the same base:
 		love.graphics.setColor(newColor)
 
 		if not self.enabled then
-			love.graphics.setColor(63, 63, 63, style.bgColor[4] or 255)
+			love.graphics.setColor(63 / 255, 63 / 255, 63 / 255, style.bgColor[4] or 255)
 		end
 
 		local radiusCorner = style.radius
 
-		love.graphics.stencil(function()
+	love.graphics.stencil(function()
       love.graphics.rectangle("fill",
         math.floor(self.x),
         math.floor(self.y),
@@ -279,9 +279,9 @@ function component:draw()-- Every component has the same base:
 		end
 
 		if self.mode3d then
-			love.graphics.setColor(255, 255, 255, style.bgColor[4] or 255)
+			love.graphics.setColor(1, 1, 1, style.bgColor[4] or 1)
 			if not self.enabled then
-				love.graphics.setColor(0, 0, 0, style.bgColor[4] or 255)
+				love.graphics.setColor(0, 0, 0, style.bgColor[4] or 1)
 			end
 			love.graphics.draw(img,
 				self.x + self.w / 2,
@@ -304,7 +304,7 @@ function component:draw()-- Every component has the same base:
 		end
 
 		if self.glass then
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 			love.graphics.draw(self.imgGlass,
 				self.x,
 				self.y,
@@ -314,7 +314,7 @@ function component:draw()-- Every component has the same base:
 		end
 
     if self.bgImage then
-      love.graphics.setColor(255, 255, 255)
+      love.graphics.setColor(1, 1, 1)
       love.graphics.draw(self.bgImage,
         math.floor(self.x),
         math.floor(self.y),
@@ -328,7 +328,7 @@ function component:draw()-- Every component has the same base:
 		if style.showBorder then
 			love.graphics.setColor(newColor)
 			if not self.enabled then
-				love.graphics.setColor(63, 63, 63)
+				love.graphics.setColor(63 / 255, 63 / 255, 63 / 255)
 			end
 			love.graphics.rectangle("line",
 				math.floor(self.x),
@@ -356,7 +356,7 @@ function component:drawShadowPressed()
         end, "replace", 1)
         love.graphics.setStencilTest("greater", 0)
 
-        love.graphics.setColor(255, 255, 255)
+        love.graphics.setColor(1, 1, 1)
         love.graphics.draw(self.imgShadow,
             self.x + self.w / 2,
             self.y + self.h / 2,
@@ -405,7 +405,7 @@ function component:wasReleased()
 	local b = self:overIt() and self.enabled and self.visible
 	if self.type == "text" then
 		if b then
-			love.keyboard.setTextInput(true) 
+			love.keyboard.setTextInput(true)
 		end
 	end
 	return b

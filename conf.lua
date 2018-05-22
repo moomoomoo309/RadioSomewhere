@@ -1,7 +1,7 @@
 local stringx = require "pl.stringx"
 
-love.filesystem.newFile("currentResolution.txt")
-if not love.filesystem.isFile("currentResolution.txt") then
+love.filesystem.newFile "currentResolution.txt"
+if not love.filesystem.getInfo "currentResolution.txt".type == "file" then
     love.filesystem.write("currentResolution.txt", "1360\n768")
 end
 
@@ -16,6 +16,6 @@ function love.conf(t)
     local w, h = unpack(readFromFile("currentResolution.txt"))
     t.window.width = w
     t.window.height = h
-    t.version = "0.10.2"
+    t.version = "11.1"
     t.vsync = false
 end

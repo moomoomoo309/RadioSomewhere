@@ -1,3 +1,4 @@
+serpent = require "serpent"
 local parser = require "parser"
 require "gooi"
 local gooi = gooi
@@ -7,13 +8,13 @@ local audioHandler = require "audioHandler"
 local gui = require "game-gui.gui"
 local scheduler = require "scheduler"
 local sprite = require "sprite"
-local shine = require "shine"
+local moonshine = require "moonshine"
 
-serpent = require "serpent"
 
 local w, h = love.graphics.getDimensions()
 
 optionLocked = false
+scanlineSpeed = .05
 
 io.stdout:setvbuf "no"
 
@@ -36,9 +37,11 @@ local titlecardStatic = sprite {
     h = h * 441 / 1080,
     imagePath = "assets/titlecardstatic.png"
 }
-local titlecardStaticNoiseShader = shine.filmgrain()
-titlecardStaticNoiseShader.opacity = .5
-staticShader = titlecardStaticNoiseShader:chain(imageScanlineEffect)
+
+staticShader = moonshine(moonshine.effects.filmgrain)
+        .chain(moonshine.effects.scanlines)
+staticShader.opacity = .5
+staticShader.thickness = .15
 
 local cancelMusicLoop
 
@@ -137,7 +140,7 @@ remainingTransmissions = {
 }
 local firstScript = true
 
-
+offsetY = 0
 local function drawGame()
     if not atTitleScreen then
         drawMainScreen()
@@ -147,10 +150,13 @@ local function drawGame()
     else
         if gui.currentMenu() == "main_menu" then
             titlecard:draw()
-            staticShader:draw(function()
+            staticShader.draw(function()
+                staticShader.scanlines.setters.offsetY(offsetY)
+                offsetY = offsetY + scanlineSpeed
                 titlecardStatic:draw()
             end)
-            textShader:draw(function()
+            textShader.draw(function()
+                textShader.scanlines.setters.offsetY(offsetY)
                 gooi.draw "main_menu"
                 love.graphics.push()
                 love.graphics.translate(120 * h / 720, 17 * h / 720)
@@ -159,7 +165,7 @@ local function drawGame()
                 love.graphics.pop()
             end)
         end
-        imageShader:draw(function()
+        imageShader.draw(function()
             love.graphics.push()
             love.graphics.shear(-.055, -.03)
             love.graphics.rotate(math.rad(-2))
@@ -169,7 +175,7 @@ local function drawGame()
         end)
     end
     if exitOpen then
-        imageShader:draw(function()
+        imageShader.draw(function()
             gooi.draw()
         end)
     end
@@ -197,8 +203,6 @@ function love.update(dt)
         moan.update(dt)
     end
     gooi.update(dt)
-    imageScanlineEffect:set("y_offset", imageScanlineEffect._y_offset + dt * scanlineSpeed)
-    textScanlineEffect:set("y_offset", textScanlineEffect._y_offset + dt * scanlineSpeed)
 end
 
 local firstRun = true
