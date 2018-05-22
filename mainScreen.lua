@@ -53,11 +53,10 @@ textShader = moonshine(moonshine.effects.boxblur)
                 .chain(moonshine.effects.filmgrain)
 textShader.glow.min_luma = .65
 textShader.glow.strength = 2
-textShader.thickness = .15
-textShader.radius = 1 * h / 1080
-textShader.boxblur.radius = 1 * h / 1080
+textShader.thickness = .05
+textShader.radius = 2 * h / 1080
+textShader.boxblur.radius = 2 * h / 1080
 textShader.opacity = .15
-textShader.size = 2 * h / 1080
 
 local faceBlurEffect = moonshine(moonshine.effects.boxblur)
 faceBlurEffect.radius = h / 720
@@ -69,7 +68,7 @@ faceStatic.size = h / 720
 imageShader = moonshine(moonshine.effects.boxblur)
         .chain(moonshine.effects.filmgrain)
         .chain(moonshine.effects.scanlines)
-imageShader.thickness = .15
+imageShader.thickness = .05
 imageShader.boxblur.radius = h / 720
 imageShader.opacity = .15
 imageShader.size = h / 720
@@ -146,7 +145,8 @@ local function draw()
     textShader.scanlines.setters.offsetY(offsetY)
     textShader.draw(moanDraw)
     face:draw()
-    staticShader.draw(function()
+    imageShader.draw(function()
+        imageShader.scanlines.setters.offsetY(offsetY)
         face:draw()
     end)
     crt:draw()

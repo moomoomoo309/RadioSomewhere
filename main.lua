@@ -1,3 +1,5 @@
+w, h = love.graphics.getDimensions()
+
 serpent = require "serpent"
 local parser = require "parser"
 require "gooi"
@@ -10,8 +12,6 @@ local scheduler = require "scheduler"
 local sprite = require "sprite"
 local moonshine = require "moonshine"
 
-
-local w, h = love.graphics.getDimensions()
 
 optionLocked = false
 scanlineSpeed = .05
@@ -38,11 +38,6 @@ local titlecardStatic = sprite {
     imagePath = "assets/titlecardstatic.png"
 }
 
-staticShader = moonshine(moonshine.effects.filmgrain)
-        .chain(moonshine.effects.scanlines)
-staticShader.opacity = .5
-staticShader.thickness = .15
-
 local cancelMusicLoop
 
 local function init()
@@ -68,7 +63,8 @@ local function queueDialogueOptions()
     print "Locking parser..."
     parser.lock()
     scheduler.after(.75, function()
-        parser.unlock() print "Unlocking parser..."
+        parser.unlock()
+        print "Unlocking parser..."
     end)
 end
 
@@ -144,14 +140,11 @@ offsetY = 0
 local function drawGame()
     if not atTitleScreen then
         drawMainScreen()
-        if gui.currentMenu() == "pause" then
-            gooi.draw "pause"
-        end
     else
         if gui.currentMenu() == "main_menu" then
             titlecard:draw()
-            staticShader.draw(function()
-                staticShader.scanlines.setters.offsetY(offsetY)
+            imageShader.draw(function()
+                imageShader.scanlines.setters.offsetY(offsetY)
                 offsetY = offsetY + scanlineSpeed
                 titlecardStatic:draw()
             end)
@@ -188,11 +181,16 @@ local function drawGame()
 end
 
 function love.draw()
-    drawGame()
+    if not pauseDone then
+        pauseShader.draw(drawGame)
+    else
+        drawGame()
+    end
+    if gui.currentMenu() == "pause" then
+        gooi.draw "pause"
+    end
     love.graphics.print("Current FPS: " .. tostring(love.timer.getFPS()), 10, 10)
 end
-
-local scanlineSpeed = 5
 
 function love.update(dt)
     if atTitleScreen and not gui.currentMenu() then
@@ -226,8 +224,8 @@ function advanceDialogue()
                     print("Error!", success, msg)
                 elseif msg then
                     moan.speak("", { msg })
-                    print("msg="..msg)
-                      moan.keypressed "space"
+                    print(("msg=%s"):format(msg))
+                    moan.keypressed "space"
                 else
                     moan.keypressed "space"
                 end
@@ -236,7 +234,7 @@ function advanceDialogue()
                     queueDialogueOptions()
                 end
             else
-                print("opts")
+                print "opts"
                 print(serpent.block(moan.allMsgs[moan.currentMsgInstance]))
                 moan.keypressed "space"
             end

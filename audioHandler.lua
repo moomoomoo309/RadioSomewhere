@@ -68,7 +68,7 @@ function audioHandler.play(fileName, callback)
     local audioObj = audioHandler.audioObjs[fileName]
     assert(audioObj, ("No audio file with filename %s found."):format(fileName))
     if audioObj then
-        audioObj:play()
+        love.audio.play(audioObj)
     end
     local cancelFct
     cancelFct = scheduler.when(function()
@@ -104,7 +104,7 @@ function audioHandler.loop(fileName, callback, startTime)
     local audioObj = audioHandler.audioObjs[fileName]
     local function play(audioObj)
         scheduler.after(startTime, function()
-            audioObj:play()
+            love.audio.play(audioObj)
             audioObj:setVolume(0)
             scheduler.before(3, function(timeElapsed)
                 audioObj:setVolume(cosInterp(0, 1, timeElapsed / 3))
@@ -169,7 +169,7 @@ end
 function audioHandler.pause(fileName)
     local audioObj = audioHandler.audioObjs[fileName]
     assert(audioObj, ("No audio object with name %s found."):format(fileName))
-    audioObj:pause()
+    love.audio.pause(audioObj)
 end
 
 --- Resumes the audio object with the given name from the audio handler, if it exists.
@@ -178,7 +178,7 @@ end
 function audioHandler.resume(fileName)
     local audioObj = audioHandler.audioObjs[fileName]
     assert(audioObj, ("No audio object with name %s found."):format(fileName))
-    audioObj:resume()
+    love.audio.play(audioObj)
 end
 
 local files = { names = {}, priority = {}, extensions = {} }
@@ -199,7 +199,7 @@ end
 
 --Add them all
 for name in pairs(files.names) do
-    print(("%s/%s.%s"):format(audioDir, name, files.extensions[name]), name)
+--    print(("%s/%s.%s"):format(audioDir, name, files.extensions[name]), name)
     audioHandler.add(("%s/%s.%s"):format(audioDir, name, files.extensions[name]), name)
 end
 files = nil

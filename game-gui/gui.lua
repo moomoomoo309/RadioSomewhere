@@ -1,6 +1,8 @@
 require "gooi"
 local moan = require "Moan"
 local scheduler = require "scheduler"
+local moonshine = require "moonshine"
+local audioHandler = require "audioHandler"
 
 local height = love.graphics.getHeight()
 local width = love.graphics.getWidth()
@@ -24,12 +26,64 @@ exitOpen = false
 
 gooi.setStyle({ font = love.graphics.newFont("assets/VT323-Regular.ttf", 30 * height / 720) })
 
+pauseShader = moonshine(moonshine.effects.boxblur)
+        .chain(moonshine.effects.vignette)
+        .chain(moonshine.effects.desaturate)
+pauseShader.boxblur.radius = h / 720
+pauseShader.vignette.opacity = 0
+pauseShader.vignette.radius = 1
+
+
+local cancelPause
+local blurRadius = 5
+pauseDone = true
+
 --- Pause toggle menu
 --- @return nil
 local function togglePause()
     paused = not paused
     pauseLabel:setVisible(paused)
+    if type(cancelPause) == "function" then
+        cancelPause()
+    end
+    if paused then
+        local blurTime = .25
+        local cancelFct1, cancelFct2
+        pauseDone = false
+        cancelFct1 = scheduler.before(blurTime, function(timeElapsed)
+            local percentProgress = timeElapsed / blurTime
+            pauseShader.boxblur.radius = blurRadius * percentProgress
+            pauseShader.vignette.opacity = percentProgress
+            pauseShader.desaturate.strength = percentProgress / 2
+        end, nil, "GUI")
+        cancelFct2 = scheduler.after(blurTime, function()
+            pauseShader.boxblur.radius = blurRadius
+            pauseShader.vignette.opacity = 1
+            pauseShader.desaturate.strength = .5
+        end, "GUI")
+        cancelPause = function()
+            cancelFct1()
+            cancelFct2()
+        end
+    else
+        local blurTime = .1
+        scheduler.before(blurTime, function(timeElapsed)
+            local percentProgress = 1 - timeElapsed / blurTime
+            pauseShader.boxblur.radius = blurRadius * percentProgress
+            pauseShader.vignette.opacity = percentProgress
+            pauseShader.desaturate.strength = percentProgress / 2
+        end, nil, "GUI")
+        cancelFct2 = scheduler.after(blurTime, function()
+            pauseShader.boxblur.radius = 0
+            pauseShader.vignette.opacity = 0
+            pauseShader.desaturate.strength = 0
+            pauseDone = true
+        end, "GUI")
+        cancelPause = nil
+    end
+
     scheduler[paused and "pause" or "resume"] "pausable"
+    audioHandler[paused and "pauseAll" or "resumeAll"]()
 end
 
 --- Visibility toggle for the settings screen
@@ -331,9 +385,6 @@ local function init()
         layout = "grid 4x1"
     })                  :add(gooi.newButton({ text = "chris" }))
 
-    for k, v in pairs(contactsPanel.sons) do
-        print(k, v)
-    end
 
     local function switchToContacts()
         if not contactsPanel.sons[1].ref.visible and contactsBtn.visible then
