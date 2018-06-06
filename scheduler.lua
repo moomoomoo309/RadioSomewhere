@@ -150,6 +150,7 @@ function scheduler.when(conditionFct, fct, cancelFct, group)
         if type(cancelFct) == "function" then
             cancelFct()
         end
+        scheduler.functions[group][index]()
     end
 end
 

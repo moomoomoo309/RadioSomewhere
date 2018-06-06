@@ -64,7 +64,7 @@ function gooi.newLabel(params)
     local l = {}
     defaultText = "new label"
 
-    x, y, w, h = gooi.checkBounds(
+    local x, y, w, h = gooi.checkBounds(
             params.text or defaultText,
             params.x or 10,
             params.y or 10,
@@ -198,7 +198,7 @@ function gooi.newButton(params)
     local defaultText = "new button"
     local theH = gooi.getFont():getHeight()
 
-    x, y, w, h = gooi.checkBounds(
+    local x, y, w, h = gooi.checkBounds(
             params.text or defaultText,
             params.x or 10,
             params.y or 10,
@@ -331,7 +331,7 @@ function gooi.newSlider(params)
     params = params or {}
     local s = {}
 
-    x, y, w, h = gooi.checkBounds(
+    local x, y, w, h = gooi.checkBounds(
             params.value or 0.5,
             params.x or 10,
             params.y or 10,
@@ -490,7 +490,7 @@ function gooi.newCheck(params)
     params = params or {}
     local chb = {}
 
-    x, y, w, h = gooi.checkBounds(
+    local x, y, w, h = gooi.checkBounds(
             params.text or "",
             params.x or 10,
             params.y or 10,
@@ -550,7 +550,7 @@ function gooi.newRadio(params)
     params = params or {}
     local r = {}
 
-    x, y, w, h = gooi.checkBounds(
+    local x, y, w, h = gooi.checkBounds(
             params.text or "",
             params.x or 10,
             params.y or 10,
@@ -627,7 +627,7 @@ function gooi.newText(params)
     local f = {}
     local defaultText = "Type here"
 
-    x, y, w, h = gooi.checkBounds(
+    local x, y, w, h = gooi.checkBounds(
             params.text or defaultText,
             params.x or 10,
             params.y or 10,
@@ -881,7 +881,7 @@ function gooi.newBar(params)
     params = params or {}
     local p = {}
 
-    x, y, w, h = gooi.checkBounds(
+    local x, y, w, h = gooi.checkBounds(
             "..........",
             params.x or 10,
             params.y or 10,
@@ -1010,7 +1010,7 @@ function gooi.newSpinner(params)
     params = params or {}
     local s = {}
 
-    x, y, w, h = gooi.checkBounds(
+    local x, y, w, h = gooi.checkBounds(
             "..........",
             params.x or 10,
             params.y or 10,
@@ -1142,7 +1142,7 @@ function gooi.newJoy(params)
     local s = {}
     local defSize = gooi.unit * 4
 
-    x, y, w, h = gooi.checkBounds(
+    local x, y, w, h = gooi.checkBounds(
             "..........",
             params.x or 10,
             params.y or 10,
@@ -1368,7 +1368,7 @@ function gooi.newKnob(params)
     local k = {}
     local defSize = gooi.unit * 3
 
-    x, y, w, h = gooi.checkBounds(
+    local x, y, w, h = gooi.checkBounds(
             "..........",
             params.x or 10,
             params.y or 10,
@@ -1493,7 +1493,7 @@ function gooi.newPanel(params)
     local p = {}
     local defLayout = "grid 3x3"
 
-    x, y, w, h = gooi.checkBounds(
+    local x, y, w, h = gooi.checkBounds(
             "..........",
             params.x or 10,
             params.y or 10,

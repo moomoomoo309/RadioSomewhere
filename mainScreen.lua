@@ -4,8 +4,6 @@ local moan = require "Moan"
 local scheduler = require "scheduler"
 require "gooi"
 
-local w, h = love.graphics.getDimensions()
-
 local textColor = { 74 / 255, 215 / 255, 1 }
 
 local console = sprite {
@@ -53,10 +51,11 @@ textShader = moonshine(moonshine.effects.boxblur)
                 .chain(moonshine.effects.filmgrain)
 textShader.glow.min_luma = .65
 textShader.glow.strength = 2
-textShader.thickness = .05
+textShader.filmgrain.opacity = .15
+textShader.scanlines.thickness = .65 * h / 720
+textShader.scanlines.opacity = .5
 textShader.radius = 2 * h / 1080
 textShader.boxblur.radius = 2 * h / 1080
-textShader.opacity = .15
 
 local faceBlurEffect = moonshine(moonshine.effects.boxblur)
 faceBlurEffect.radius = h / 720
@@ -65,13 +64,15 @@ local faceStatic = moonshine(moonshine.effects.filmgrain)
 faceStatic.opacity = .15
 faceStatic.size = h / 720
 
-imageShader = moonshine(moonshine.effects.boxblur)
-        .chain(moonshine.effects.filmgrain)
+imageShader = moonshine(moonshine.effects.filmgrain)
         .chain(moonshine.effects.scanlines)
-imageShader.thickness = .05
-imageShader.boxblur.radius = h / 720
-imageShader.opacity = .15
-imageShader.size = h / 720
+        .chain(moonshine.effects.boxblur)
+imageShader.filmgrain.opacity = .5
+imageShader.filmgrain.size = 2
+imageShader.scanlines.thickness = .65 * h / 720
+imageShader.scanlines.opacity = .85
+imageShader.boxblur.radius = 1.5
+
 
 
 local marqueeOffset = 0
@@ -141,12 +142,9 @@ end
 
 local function draw()
     console:draw()
-    offsetY = offsetY + scanlineSpeed
-    textShader.scanlines.setters.offsetY(offsetY)
     textShader.draw(moanDraw)
     face:draw()
     imageShader.draw(function()
-        imageShader.scanlines.setters.offsetY(offsetY)
         face:draw()
     end)
     crt:draw()

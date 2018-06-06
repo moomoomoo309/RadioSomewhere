@@ -6,14 +6,13 @@ if not love.filesystem.getInfo "currentResolution.txt".type == "file" then
 end
 
 local function readFromFile(file)
-    str = love.filesystem.read(file)
-
+    local str = love.filesystem.read(file)
 
     return stringx.split(str)
 end
 
 function love.conf(t)
-    local w, h = unpack(readFromFile("currentResolution.txt"))
+    local w, h = unpack(readFromFile "currentResolution.txt")
     t.window.width = w
     t.window.height = h
     t.version = "11.1"

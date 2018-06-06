@@ -27,7 +27,9 @@ local mainScript = {
                             "#bot3412: PROCESSING...",
                             "#bot3412: I'M SORRY.",
                             "#bot3412: PLEASE PROVIDE YOUR ADDRESS IN THE FORM OF: HOUSE/APARTMENT NUMBER, STREET NAME, STATE, ZIP CODE, COUNTRY.",
-                            ["Disconnect."] = endScript
+                            {
+                                ["Disconnect."] = endScript
+                            }
                         },
                         ["Disconnect."] = endScript,
                     },

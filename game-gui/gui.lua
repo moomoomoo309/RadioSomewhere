@@ -55,12 +55,12 @@ local function togglePause()
             pauseShader.boxblur.radius = blurRadius * percentProgress
             pauseShader.vignette.opacity = percentProgress
             pauseShader.desaturate.strength = percentProgress / 2
-        end, nil, "GUI")
+        end, nil, "pauseMenu")
         cancelFct2 = scheduler.after(blurTime, function()
             pauseShader.boxblur.radius = blurRadius
             pauseShader.vignette.opacity = 1
             pauseShader.desaturate.strength = .5
-        end, "GUI")
+        end, "pauseMenu")
         cancelPause = function()
             cancelFct1()
             cancelFct2()
@@ -72,13 +72,13 @@ local function togglePause()
             pauseShader.boxblur.radius = blurRadius * percentProgress
             pauseShader.vignette.opacity = percentProgress
             pauseShader.desaturate.strength = percentProgress / 2
-        end, nil, "GUI")
+        end, nil, "pauseMenu")
         cancelFct2 = scheduler.after(blurTime, function()
             pauseShader.boxblur.radius = 0
             pauseShader.vignette.opacity = 0
             pauseShader.desaturate.strength = 0
             pauseDone = true
-        end, "GUI")
+        end, "pauseMenu")
         cancelPause = nil
     end
 

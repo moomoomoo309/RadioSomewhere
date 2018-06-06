@@ -45,6 +45,11 @@ local function init()
     parseScript "assets.drinkingBuddyScript"
     moan.speak("", { "\t\t\tI N C O M I N G\t\tT R A N S M I S S I O N \n\n\n\n\t\t\t\t\t\t[SPACE TO CONTINUE]" })
     cancelMusicLoop = audioHandler.loop("Openeraudio", nil, 0)
+    scheduler.everyCondition(function() return gui.currentMenu() ~= "pause" end, function()
+        offsetY = offsetY + scanlineSpeed
+        imageShader.scanlines.setters.offsetY(offsetY)
+        textShader.scanlines.setters.offsetY(offsetY)
+    end, nil, "pauseable")
 end
 
 function love.load()
@@ -144,33 +149,30 @@ local function drawGame()
         if gui.currentMenu() == "main_menu" then
             titlecard:draw()
             imageShader.draw(function()
-                imageShader.scanlines.setters.offsetY(offsetY)
-                offsetY = offsetY + scanlineSpeed
                 titlecardStatic:draw()
             end)
             textShader.draw(function()
-                textShader.scanlines.setters.offsetY(offsetY)
                 gooi.draw "main_menu"
                 love.graphics.push()
                 love.graphics.translate(120 * h / 720, 17 * h / 720)
                 love.graphics.shear(-.2, 0)
                 gooi.draw "main_menu_title"
                 love.graphics.pop()
+                love.graphics.push()
+                love.graphics.shear(-.055, -.03)
+                love.graphics.rotate(math.rad(-2))
+                love.graphics.translate(30 * h / 1080, 35 * h / 1080)
+                gooi.draw "settings"
+                love.graphics.pop()
             end)
         end
-        imageShader.draw(function()
-            love.graphics.push()
-            love.graphics.shear(-.055, -.03)
-            love.graphics.rotate(math.rad(-2))
-            love.graphics.translate(30 * h / 1080, 35 * h / 1080)
-            gooi.draw "settings"
-            love.graphics.pop()
-        end)
     end
     if exitOpen then
-        imageShader.draw(function()
-            gooi.draw()
-        end)
+        local oldColor = {love.graphics.getColor()}
+        love.graphics.setColor(0, 0, 0, .35)
+        love.graphics.rectangle("fill", 0, 0, w, h)
+        love.graphics.setColor(oldColor)
+        textShader.draw(gooi.draw)
     end
     if not gui.currentMenu() then
         if databaseBtn.visible then
