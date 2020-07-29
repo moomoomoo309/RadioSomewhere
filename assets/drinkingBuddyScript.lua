@@ -1,4 +1,4 @@
----[[
+--[[
 return {
     "Skip!",
     function(val, tbl)
@@ -8,16 +8,7 @@ return {
     end,
 }
 --]]
---[[
-return {
-    "Skip!",
-    function()
-        parseScript()
-        return endStr
-    end,
-}
-
---[[
+---[[
 
 return {
     "#thomas: Hey Carl, thank god man. Things have really gone to shit huh?",
@@ -26,6 +17,7 @@ return {
             "#uwsss: I'm sorry this isn't Carl.",
             "#thomas: What? Who are you? How’d ya get on Carl’s console?",
             "#uwsss: This is [REDACTED] aboard the United World Service Space Station. I’ve been trying to get in touch with my command center for days, but I can’t get a transmission through.",
+            "@goto JoMama",
             "#uwsss: All I can do is intercept junk signals.",
             "#thomas: You, me, and the rest of the world space man. I haven't been able to get a signal worth a damn since all this started",
             "#uwsss: What happened down there?",
@@ -33,6 +25,7 @@ return {
             "#uwsss: What happened down there?",
             "#thomas: I’m sorry… You must be the last person alive that doesn't know.",
             "#thomas: The world is coming to an end. I’m sorry.",
+            "Going to...",
             "#uwsss: …",
             "#uwsss: I don’t understand.",
             "#thomas: Yeah, turns out that's it for us. It doesn't matter why",
@@ -58,7 +51,6 @@ return {
                     "#uwsss: What are you gonna do now?",
                     "#thomas: Not much left to do but pour yourself a drink and wait.",
                 },
-
                 ["#uwsss: Tequila"] = {
                     "#thomas: That’s a damn good choice.",
                     "#thomas: Can’t think of a better way to celebrate the end of days. Carl actually didn't like tequila all that much, but he insisted on drinking it.",
@@ -67,6 +59,7 @@ return {
                 ["#uwsss: Beer"] = {
                     "#thomas: I was kinda hoping you’d say that.",
                     "#thomas: As good as all this fancy crap is, there’s nothing better than a simple brew. I must’ve spat out half of my first beer. I must’ve been 15.",
+                    "label@JoMama",
                     "#thomas: Me and Carl used to beers out of his dads fridge. Ya know Carl never did acquire much of a taste for beer. He always said it was good, but too plain.",
                     "#thomas: I Don’t think so though. Under the hopps, there’s a sort of nostalgia to ‘em.",
                 },

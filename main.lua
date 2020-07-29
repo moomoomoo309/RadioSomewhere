@@ -10,11 +10,12 @@ local audioHandler = require "audioHandler"
 local gui = require "game-gui.gui"
 local scheduler = require "scheduler"
 local sprite = require "sprite"
-local moonshine = require "moonshine"
 
 
 optionLocked = false
-scanlineSpeed = .05
+scanlineSpeed = .005085 / w * 1366
+offsetY = 0
+
 
 io.stdout:setvbuf "no"
 
@@ -141,7 +142,6 @@ remainingTransmissions = {
 }
 local firstScript = true
 
-offsetY = 0
 local function drawGame()
     if not atTitleScreen then
         drawMainScreen()
@@ -153,16 +153,18 @@ local function drawGame()
             end)
             textShader.draw(function()
                 gooi.draw "main_menu"
+
                 love.graphics.push()
-                love.graphics.translate(120 * h / 720, 17 * h / 720)
-                love.graphics.shear(-.2, 0)
-                gooi.draw "main_menu_title"
+                    love.graphics.translate(120 * h / 720, 17 * h / 720)
+                    love.graphics.shear(-.2, 0)
+                    gooi.draw "main_menu_title"
                 love.graphics.pop()
+
                 love.graphics.push()
-                love.graphics.shear(-.055, -.03)
-                love.graphics.rotate(math.rad(-2))
-                love.graphics.translate(30 * h / 1080, 35 * h / 1080)
-                gooi.draw "settings"
+                    love.graphics.shear(-.055, -.03)
+                    love.graphics.rotate(math.rad(-2))
+                    love.graphics.translate(30 * h / 1080, 35 * h / 1080)
+                    gooi.draw "settings"
                 love.graphics.pop()
             end)
         end

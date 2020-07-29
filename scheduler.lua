@@ -1,8 +1,8 @@
 --- A class allowing for functions to be scheduled based on certain conditions.
---- @classmod scheduler
---- @field paused Contains whether a group is paused or not.
---- @field functions Contains the functions within a group.
---- @field groups Contains a flat list of groups.
+--- @class scheduler
+--- @field paused table Contains whether a group is paused or not.
+--- @field functions table Contains the functions within a group.
+--- @field groups table Contains a flat list of groups.
 local scheduler = {
     paused = {},
     functions = {},
@@ -10,7 +10,7 @@ local scheduler = {
 }
 
 --- Sleeps the running coroutine until seconds has passed. Will not work on the main thread.
---- @tparam number seconds How many seconds to sleep for.
+--- @param seconds number How many seconds to sleep for.
 --- @return nil
 function scheduler.sleep(seconds)
     assert(type(seconds) == "number", ("Number expected, got %s."):format(type(seconds)))
@@ -28,10 +28,10 @@ function scheduler.sleep(seconds)
 end
 
 --- Run fct after seconds has passed. Returns a function which cancels this function.
---- @tparam number seconds How many seconds to wait before running fct.
---- @tparam function fct The function to run after the time has passed.
---- @tparam string|nil group (Optional) The group the function should be in. Defaults to "default"
---- @treturn function a function which cancels this function.
+--- @param seconds number How many seconds to wait before running fct.
+--- @param fct function The function to run after the time has passed.
+--- @param group string|nil The group the function should be in. Defaults to "default"
+--- @return function a function which cancels this function.
 function scheduler.after(seconds, fct, group)
     assert(type(fct) == "function", ("Function expected, got %s."):format(type(fct)))
     group = group or "default"
@@ -53,11 +53,11 @@ function scheduler.after(seconds, fct, group)
 end
 
 --- Run fct until seconds has passed. Returns a function which cancels this function.
---- @tparam number seconds How many seconds to wait until fct should stop being run.
---- @tparam function fct The function to continuously run before the time has passed.
---- @tparam function|nil cancelFct (Optional) A function to run if this one is cancelled.
---- @tparam string|nil group (Optional) The group the function should be in. Defaults to "default".
---- @treturn function a function which cancels this function.
+--- @param seconds number How many seconds to wait until fct should stop being run.
+--- @param fct function The function to continuously run before the time has passed.
+--- @param cancelFct function|nil A function to run if this one is cancelled.
+--- @param group string|nil The group the function should be in. Defaults to "default".
+--- @return function a function which cancels this function.
 function scheduler.before(seconds, fct, cancelFct, group)
     assert(type(fct) == "function", ("Function expected, got %s."):format(type(fct)))
     assert(type(cancelFct) == "function" or not cancelFct, ("Function or nil expected, got %s."):format(type(cancelFct)))
@@ -84,11 +84,11 @@ function scheduler.before(seconds, fct, cancelFct, group)
 end
 
 --- Runs fct until conditionFct returns a truthy value or the function returned is called.
---- @tparam function conditionFct A function supplying the condition that will stop fct.
---- @tparam function fct The function to run continuously while conditionFct returns a truthy value.
---- @tparam function|nil cancelFct (Optional) A function to run if this one is cancelled.
---- @tparam string|nil group (Optional) The group the function should be in. Defaults to "default".
---- @treturn function a function which cancels this function.
+--- @param conditionFct function A function supplying the condition that will stop fct.
+--- @param fct function The function to run continuously while conditionFct returns a truthy value.
+--- @param cancelFct function|nil A function to run if this one is cancelled.
+--- @param group string|nil The group the function should be in. Defaults to "default".
+--- @return function a function which cancels this function.
 function scheduler._until(conditionFct, fct, cancelFct, group)
     assert(type(fct) == "function", ("Function expected, got %s."):format(type(fct)))
     assert(type(conditionFct) == "function", ("Function expected, got %s."):format(type(conditionFct)))
@@ -118,11 +118,11 @@ end
 scheduler["until"] = scheduler._until
 
 --- Runs fct when conditionFct returns a truthy value or the function returned is called without a parameter.
---- @tparam function conditionFct A function supplying the condition that will run fct.
---- @tparam function fct The function to run when conditionFct returns a truthy value.
---- @tparam function|nil cancelFct (Optional) A function to run if this one is cancelled.
---- @tparam string|nil group (Optional) The group the function should be in. Defaults to "default".
---- @treturn function A function which cancels this function. Takes a parameter specifying if fct should not be run.
+--- @param conditionFct function A function supplying the condition that will run fct.
+--- @param fct function The function to run when conditionFct returns a truthy value.
+--- @param cancelFct function|nil A function to run if this one is cancelled.
+--- @param group string|nil The group the function should be in. Defaults to "default".
+--- @return function A function which cancels this function. Takes a parameter specifying if fct should not be run.
 function scheduler.when(conditionFct, fct, cancelFct, group)
     assert(type(fct) == "function", ("Function expected, got %s."):format(type(fct)))
     assert(type(conditionFct) == "function", ("Function expected, got %s."):format(type(conditionFct)))
@@ -155,11 +155,11 @@ function scheduler.when(conditionFct, fct, cancelFct, group)
 end
 
 --- Runs fct every seconds seconds.
---- @tparam number seconds The number of seconds to wait between running fct.
---- @tparam function fct The function to run every seconds seconds.
---- @tparam function|nil cancelFct (Optional) A function to run if this one is cancelled.
---- @tparam string|nil group (Optional) The group the function should be in. Defaults to "default".
---- @treturn function a function which cancels this function.
+--- @param seconds number The number of seconds to wait between running fct.
+--- @param fct function The function to run every seconds seconds.
+--- @param cancelFct function|nil A function to run if this one is cancelled.
+--- @param group string|nil The group the function should be in. Defaults to "default".
+--- @return function a function which cancels this function.
 function scheduler.every(seconds, fct, cancelFct, group)
     assert(type(fct) == "function", ("Function expected, got %s."):format(type(fct)))
     assert(type(cancelFct) == "function" or not cancelFct, ("Function or nil expected, got %s."):format(type(cancelFct)))
@@ -188,11 +188,11 @@ function scheduler.every(seconds, fct, cancelFct, group)
 end
 
 --- Runs fct every time conditionFct returns a truthy value.
---- @tparam function conditionFct A function supplying the condition that will run fct.
---- @tparam function fct The function to run every time conditionFct returns a truthy value.
---- @tparam function|nil cancelFct (Optional) A function to run if this one is cancelled.
---- @tparam string|nil group (Optional) The group the function should be in. Defaults to "default".
---- @treturn string a function which cancels this function.
+--- @param conditionFct function A function supplying the condition that will run fct.
+--- @param fct function The function to run every time conditionFct returns a truthy value.
+--- @param cancelFct function|nil A function to run if this one is cancelled.
+--- @param group string|nil The group the function should be in. Defaults to "default".
+--- @return string a function which cancels this function.
 function scheduler.everyCondition(conditionFct, fct, cancelFct, group)
     assert(type(fct) == "function", ("Function expected, got %s."):format(type(fct)))
     assert(type(conditionFct) == "function", ("Function expected, got %s."):format(type(conditionFct)))
@@ -219,7 +219,7 @@ function scheduler.everyCondition(conditionFct, fct, cancelFct, group)
 end
 
 --- Pause the given group.
---- @tparam any group The key of the group to pause. Can technically be any value.
+--- @param group any The key of the group to pause. Can technically be any value.
 --- @return nil
 function scheduler.pause(group)
     local pausedGroup = scheduler.paused
@@ -227,7 +227,7 @@ function scheduler.pause(group)
 end
 
 --- Resumes the given group.
---- @tparam any group The key of the group to resume. Can technically be any value.
+--- @param group any The key of the group to resume. Can technically be any value.
 --- @return nil
 function scheduler.resume(group)
     local pausedGroup = scheduler.paused
@@ -235,7 +235,7 @@ function scheduler.resume(group)
 end
 
 --- Updates all of the functions in the scheduler, checking if any need to run and running them if necessary.
---- @tparam number dt The time between the last update and this one.
+--- @param dt number The time between the last update and this one.
 --- @return nil
 function scheduler.update(dt)
     assert(type(dt) == "number", ("Number expected, got %s."):format(type(dt)))

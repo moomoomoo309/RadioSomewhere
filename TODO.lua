@@ -18,8 +18,8 @@
 -- Modified promptPlayer code from FamiliarFaces:
 
 --- Prompts the player for input between options.
---- @tparam table choices The options to pick from
---- @treturn string The choice the player picked.
+--- @param choices table The options to pick from
+--- @return string The choice the player picked.
 local function promptPlayer(choices)
     local buttons = {}
     local function clearButtons()

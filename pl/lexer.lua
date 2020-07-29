@@ -125,7 +125,7 @@ local function cpp_vdump(tok)
 end
 
 --- create a plain token iterator from a string or file-like object.
--- @tparam string|file s a string or a file-like object with `:read()` method returning lines.
+-- @tparam s string|file a string or a file-like object with `:read()` method returning lines.
 -- @tab matches an optional match table - array of token descriptions.
 -- A token is described by a `{pattern, action}` pair, where `pattern` should match
 -- token body and `action` is a function called when a token of described type is found.

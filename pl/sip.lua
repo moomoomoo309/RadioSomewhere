@@ -244,7 +244,7 @@ local cache = {}
 -- @param spec a SIP pattern
 -- @param line a string
 -- @param res a table to receive values
--- @param options (optional) option table
+-- @param options option table
 -- @return true or false
 function sip.match (spec,line,res,options)
     assert_arg(1,spec,'string')

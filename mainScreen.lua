@@ -100,8 +100,8 @@ local function drawMoan(text, msgFont, msgBox, optionsPos, nextMsgSprite, maxLen
             local currentFont = msgFont or titleFont or love.graphics.getFont()
             local padding = currentFont:getHeight() * 1.35
             if not cancelMarquee then
-                cancelMarquee = scheduler.every(.1 + (1 - (moan.typeSpeed - .01) / .07) * .25, function()
-                    marqueeOffset = (marqueeOffset + 1) % maxLen
+                cancelMarquee = scheduler.every(.25 - (1-moan.typeSpeed) * .1, function()
+                    marqueeOffset = (marqueeOffset + 1) % (maxLen - 10)
                 end, function()
                     marqueeOffset = 0
                     cancelMarquee = nil

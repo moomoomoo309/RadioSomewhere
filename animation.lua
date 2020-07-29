@@ -1,5 +1,5 @@
 --- A class allowing sprites to be animated.
---- @classmod animation
+--- @class animation
 
 local object = require "object"
 local animation
@@ -12,12 +12,12 @@ animation = animation or {
 }
 
 --- Creates a new animation with the arguments provided.
---- @tparam table args A table containing arguments, which may be any of the following:<br>
---- frames: (Optional) The frames of the animation.<br>
---- frameDurations: (Optional) The duration, in seconds, of each frame of the animation, or of all of them. Defaults to 1/60.<br>
+--- @param args table A table containing arguments, which may be any of the following:<br>
+--- frames: The frames of the animation.<br>
+--- frameDurations: The duration, in seconds, of each frame of the animation, or of all of them. Defaults to 1/60.<br>
 --- sprite: The drawable used in the animation.<br>
---- colors: (Optional) A table containing all of the colors which will overlay the sprite, or one color which will overlay all of them.
---- @treturn animation The created animation.
+--- colors: A table containing all of the colors which will overlay the sprite, or one color which will overlay all of them.
+--- @return animation The created animation.
 function animation:new(args)
     local obj = object {
         frames = args.frames or {},
@@ -100,7 +100,7 @@ function animation:reset()
 end
 
 --- Makes a copy of this animation, resetting its state in the process.
---- @treturn animation The copied animation.
+--- @return animation The copied animation.
 function animation:copy()
     local obj = {
         frames = self.frames,

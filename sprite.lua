@@ -1,5 +1,5 @@
 --- A class representing a drawable 2D object (image, text, etc.). Supports callbacks.
---- @classmod sprite
+--- @class sprite
 
 local tablex = require "pl.tablex"
 local animation = require "animation"
@@ -18,7 +18,7 @@ local sprite = {
 sprite.class = sprite
 
 --- Returns the next available numeric id for a sprite.
---- @treturn number The next available numeric id for a sprite.
+--- @return number The next available numeric id for a sprite.
 function sprite.Id()
     while sprite.sprites[sprite.currentId] do
         sprite.currentId = sprite.currentId + 1
@@ -27,7 +27,7 @@ function sprite.Id()
 end
 
 --- Creates a new sprite.
---- @tparam table args The arguments to the sprite, which can be:<br>
+--- @param args table The arguments to the sprite, which can be:<br>
 --- Id: The numeric ID of the sprite.<br>
 --- imagePath: The path to the image, if it is not yet loaded.<br>
 --- image: A Drawable which represents the sprite.<br>
@@ -49,7 +49,7 @@ end
 --- filterMax: How the sprite should be filtered when scaling up. Defaults to "nearest".<br>
 --- anisotropy: How many samples of anisotropic filtering the sprite should go through. Defaults to 0.<br>
 --- animPath: The path to the anim file specifying the frames and animations of this sprite. Will be initialized if imagePath is specified.
---- @treturn sprite The created sprite.
+--- @return sprite The created sprite.
 function sprite:new(args)
     if not args and self then
         --Allows you to call sprite.new or sprite:new
@@ -126,9 +126,9 @@ function sprite:new(args)
 end
 
 --- Copies that to a new sprite.
---- @tparam sprite that The sprite to copy.
---- @tparam table args If noBatch is true, it will not use a spriteBatch to copy the sprite.
---- @treturn sprite The copied sprite.
+--- @param that sprite The sprite to copy.
+--- @param args table If noBatch is true, it will not use a spriteBatch to copy the sprite.
+--- @return sprite The copied sprite.
 function sprite:copy(that, args)
     if not args and self and that then
         --Allows you to call sprite.copy or sprite:copy.
@@ -181,15 +181,15 @@ function sprite:draw()
 end
 
 --- The method which actually draws the sprite internally. Used by sprite and spriteOverlay.
---- @tparam number x The x coordinate of the sprite.
---- @tparam number y The y coordinate of the sprite.
---- @tparam number w The width of the sprite.
---- @tparam number h the height of the sprite.
---- @tparam number rotation The rotation of the sprite, in degrees.
---- @tparam boolean flipHorizontal Whether or not the sprite should be flipped horizontally.
---- @tparam boolean flipVertical Whether or not the sprite should be flipped vertically.
---- @tparam number ox The x coordinate of the origin used for rotation, scaling, and other matrix transformations.
---- @tparam number oy The y coordinate of the origin used for rotation, scaling, and other matrix transformations.
+--- @param x number The x coordinate of the sprite.
+--- @param y number The y coordinate of the sprite.
+--- @param w number The width of the sprite.
+--- @param h number the height of the sprite.
+--- @param rotation number The rotation of the sprite, in degrees.
+--- @param flipHorizontal boolean Whether or not the sprite should be flipped horizontally.
+--- @param flipVertical boolean Whether or not the sprite should be flipped vertically.
+--- @param ox number The x coordinate of the origin used for rotation, scaling, and other matrix transformations.
+--- @param oy number The y coordinate of the origin used for rotation, scaling, and other matrix transformations.
 --- @return nil
 function sprite:_draw(x, y, w, h, rotation, flipHorizontal, flipVertical, ox, oy)
     assert(type(self) == "table" and self:extends "sprite", ("Sprite expected, got %s."):format(type(self) == "table" and self.type or type(self)))
@@ -269,7 +269,7 @@ function sprite.drawAll()
 end
 
 --- Draws all sprites within the given group.
---- @tparam string group The name of the group of sprites you want to draw.
+--- @param group string The name of the group of sprites you want to draw.
 --- @return nil
 function sprite.drawGroup(group)
     local spriteGroup = sprite.groups[group]
@@ -283,7 +283,7 @@ function sprite.drawGroup(group)
 end
 
 --- Sets the imagePath of a sprite, updating its image and animations accordingly.
---- @tparam string imagePath The path to the image file.
+--- @param imagePath string The path to the image file.
 --- @return nil
 function sprite:setImagePath(imagePath, override)
     assert(type(imagePath) == "string", ("String expected, got %s."):format(type(imagePath)))
@@ -433,42 +433,42 @@ function sprite:setImagePath(imagePath, override)
 end
 
 --- Returns what you would set ox to in order to rotate the sprite about its left side.
---- @treturn number What you would set ox to in order to rotate the sprite about its left side.
+--- @return number What you would set ox to in order to rotate the sprite about its left side.
 function sprite:leftOx()
     assert(type(self) == "table" and self:extends "sprite", ("Sprite expected, got %s."):format(type(self) == "table" and self.type or type(self)))
     return self.flipHorizontal and -self.w / self.sx or 0
 end
 
 --- Returns what you would set ox to in order to rotate the sprite about its center.
---- @treturn number What you would set ox to in order to rotate the sprite about its center.
+--- @return number What you would set ox to in order to rotate the sprite about its center.
 function sprite:centerOx()
     assert(type(self) == "table" and self:extends "sprite", ("Sprite expected, got %s."):format(type(self) == "table" and self.type or type(self)))
     return self.flipHorizontal and -self.w / 2 / self.sx or self.w / 2 / self.sx
 end
 
 --- Returns what you would set ox to in order to rotate the sprite about its right side.
---- @treturn number What you would set ox to in order to rotate the sprite about its right side.
+--- @return number What you would set ox to in order to rotate the sprite about its right side.
 function sprite:rightOx()
     assert(type(self) == "table" and self:extends "sprite", ("Sprite expected, got %s."):format(type(self) == "table" and self.type or type(self)))
     return self.flipHorizontal and 0 or -self.w / self.sx
 end
 
 --- Returns what you would set oy to in order to rotate the sprite about its top.
---- @treturn number What you would set oy to in order to rotate the sprite about its top.
+--- @return number What you would set oy to in order to rotate the sprite about its top.
 function sprite:topOy()
     assert(type(self) == "table" and self:extends "sprite", ("Sprite expected, got %s."):format(type(self) == "table" and self.type or type(self)))
     return self.flipVertical and -self.h / self.sy or 0
 end
 
 --- Returns what you would set oy to in order to rotate the sprite about its center.
---- @treturn number What you would set oy to in order to rotate the sprite about its center.
+--- @return number What you would set oy to in order to rotate the sprite about its center.
 function sprite:centerOy()
     assert(type(self) == "table" and self:extends "sprite", ("Sprite expected, got %s."):format(type(self) == "table" and self.type or type(self)))
     return self.flipVertical and -self.h / 2 / self.sy or self.h / 2 / self.sy
 end
 
 --- Returns what you would set oy to in order to rotate the sprite about its bottom.
---- @treturn number What you would set oy to in order to rotate the sprite about its bottom.
+--- @return number What you would set oy to in order to rotate the sprite about its bottom.
 function sprite:bottomOy()
     assert(type(self) == "table" and self:extends "sprite", ("Sprite expected, got %s."):format(type(self) == "table" and self.type or type(self)))
     return self.flipVertical and 0 or -self.h / self.sy
